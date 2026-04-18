@@ -1,0 +1,28 @@
+---
+import { type CollectionEntry, getCollection } from "astro:content";
+import PostDetails from "@/layouts/PostDetails.astro";
+import { getEntryLang, getEntrySlug, filterByLang } from "@/utils/i18n";
+
+type Props = {
+  guide: CollectionEntry<"guides">;
+};
+
+export async function getStaticPaths() {
+  const guides = await getCollection("guides", ({ data }) => !data.draft);
+  return guides.map(guide => ({
+    params: {
+      lang: getEntryLang(guide.id),
+      slug: guide.data.slug ?? getEntrySlug(guide.id),
+    },
+    props: { guide },
+  }));
+}
+
+const { guide } = Astro.props;
+const lang = getEntryLang(guide.id);
+
+const allGuides = await getCollection("guides");
+const langGuides = filterByLang(allGuides, lang);
+---
+
+<PostDetails post={guide} posts={langGuides} />

@@ -1,8 +1,17 @@
 ---
 import { Font } from "astro:assets";
 import { ClientRouter } from "astro:transitions";
-import { PUBLIC_GOOGLE_SITE_VERIFICATION } from "astro:env/client";
+import {
+  PUBLIC_GOOGLE_SITE_VERIFICATION,
+  PUBLIC_GA_MEASUREMENT_ID,
+} from "astro:env/client";
 import { SITE } from "@/config";
+import {
+  ACTIVE_LANGUAGES,
+  DEFAULT_LANGUAGE,
+  type LanguageCode,
+} from "@/config/languages";
+import { getCurrentLang, stripLangPrefix } from "@/utils/i18n";
 import "@/styles/global.css";
 
 type Props = {
@@ -15,6 +24,7 @@ type Props = {
   pubDatetime?: Date;
   modDatetime?: Date | null;
   scrollSmooth?: boolean;
+  noindex?: boolean;
 };
 
 const {
@@ -27,9 +37,21 @@ const {
   pubDatetime,
   modDatetime,
   scrollSmooth = false,
+  noindex = false,
 } = Astro.props;
 
 const socialImageURL = new URL(ogImage, Astro.url);
+const currentLang: LanguageCode = getCurrentLang(Astro.url.pathname);
+const pathWithoutLang = stripLangPrefix(Astro.url.pathname);
+
+const htmlLang =
+  ACTIVE_LANGUAGES.find(l => l.code === currentLang)?.htmlLang ?? "en";
+
+function buildAlternate(lang: LanguageCode) {
+  const base = SITE.website.replace(/\/$/, "");
+  const cleanPath = pathWithoutLang === "/" ? "" : pathWithoutLang;
+  return `${base}/${lang}${cleanPath}`;
+}
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -45,13 +67,14 @@ const structuredData = {
       ...(profile && { url: profile }),
     },
   ],
+  inLanguage: htmlLang,
 };
 ---
 
 <!doctype html>
 <html
   dir={SITE.dir}
-  lang=`${SITE.lang ?? "en"}`
+  lang={htmlLang}
   class={`${scrollSmooth && "scroll-smooth"}`}
 >
   <head>
@@ -60,6 +83,24 @@ const structuredData = {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
+
+    {noindex && <meta name="robots" content="noindex, follow" />}
+
+    <!-- hreflang alternates -->
+    {
+      ACTIVE_LANGUAGES.map(l => (
+        <link
+          rel="alternate"
+          hreflang={l.htmlLang}
+          href={buildAlternate(l.code)}
+        />
+      ))
+    }
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={buildAlternate(DEFAULT_LANGUAGE)}
+    />
 
     <!-- Load Font -->
     <Font
@@ -79,6 +120,9 @@ const structuredData = {
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:image" content={socialImageURL} />
+    <meta property="og:locale" content={htmlLang} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.title} />
 
     <!-- Article Published/Modified time -->
     {
@@ -113,20 +157,16 @@ const structuredData = {
     />
 
     <!-- Enable RSS feed auto-discovery  -->
-    <!-- https://docs.astro.build/en/recipes/rss/#enabling-rss-feed-auto-discovery -->
     <link
       rel="alternate"
       type="application/rss+xml"
       title={SITE.title}
-      href={new URL("rss.xml", Astro.site)}
+      href={new URL(`${currentLang}/rss.xml`, Astro.site)}
     />
 
     <meta name="theme-color" content="" />
 
     {
-      // If PUBLIC_GOOGLE_SITE_VERIFICATION is set in the environment variable,
-      // include google-site-verification tag in the heading
-      // Learn more: https://support.google.com/webmasters/answer/9008080#meta_tag_verification&zippy=%2Chtml-tag
       PUBLIC_GOOGLE_SITE_VERIFICATION && (
         <meta
           name="google-site-verification"
@@ -135,12 +175,32 @@ const structuredData = {
       )
     }
 
+    {
+      PUBLIC_GA_MEASUREMENT_ID && (
+        <script
+          is:inline
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${PUBLIC_GA_MEASUREMENT_ID}`}
+        />
+      )
+    }
+    {
+      PUBLIC_GA_MEASUREMENT_ID && (
+        <script is:inline define:vars={{ gaId: PUBLIC_GA_MEASUREMENT_ID }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', gaId, { anonymize_ip: true });
+        </script>
+      )
+    }
+
     <ClientRouter />
 
     <!-- Minimal inline script to prevent FOUC - sets theme immediately -->
     <script is:inline>
       (function () {
-        const initialColorScheme = ""; // "light" | "dark"
+        const initialColorScheme = "";
         const currentTheme = localStorage.getItem("theme");
 
         function getPreferTheme() {
@@ -153,10 +213,8 @@ const structuredData = {
 
         const themeValue = getPreferTheme();
 
-        // Set theme immediately to prevent flash
         document.firstElementChild?.setAttribute("data-theme", themeValue);
 
-        // Export minimal API for external script
         window.theme = {
           themeValue: themeValue,
           getTheme: () => window.theme.themeValue,

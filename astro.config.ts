@@ -1,6 +1,7 @@
 import { defineConfig, envField, fontProviders } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
+import mdx from "@astrojs/mdx";
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
 import {
@@ -10,13 +11,23 @@ import {
 } from "@shikijs/transformers";
 import { transformerFileName } from "./src/utils/transformers/fileName";
 import { SITE } from "./src/config";
+import { LANGUAGES } from "./src/config/languages";
 
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
+  trailingSlash: "always",
+  build: { format: "directory" },
   integrations: [
+    mdx(),
     sitemap({
       filter: page => SITE.showArchives || !page.endsWith("/archives"),
+      i18n: {
+        defaultLocale: "en",
+        locales: Object.fromEntries(
+          LANGUAGES.filter(l => l.active).map(l => [l.code, l.htmlLang])
+        ),
+      },
     }),
   ],
   markdown: {
@@ -51,6 +62,11 @@ export default defineConfig({
   env: {
     schema: {
       PUBLIC_GOOGLE_SITE_VERIFICATION: envField.string({
+        access: "public",
+        context: "client",
+        optional: true,
+      }),
+      PUBLIC_GA_MEASUREMENT_ID: envField.string({
         access: "public",
         context: "client",
         optional: true,

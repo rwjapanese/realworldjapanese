@@ -1,23 +1,25 @@
+import { DEFAULT_LANGUAGE } from "./config/languages";
+
 export const SITE = {
-  website: "https://astro-paper.pages.dev/", // replace this with your deployed domain
-  author: "Sat Naing",
-  profile: "https://satnaing.dev/",
-  desc: "A minimal, responsive and SEO-friendly Astro blog theme.",
-  title: "AstroPaper",
+  website: "https://realworldjapanese.com/",
+  author: "Real-World Japanese",
+  profile: "https://realworldjapanese.com/",
+  desc: "Real phrases for real Japanese workplaces. Stop sounding rude at work with our A/B/C politeness framework.",
+  title: "Real-World Japanese",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
   postPerIndex: 4,
-  postPerPage: 4,
-  scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
+  postPerPage: 10,
+  scheduledPostMargin: 15 * 60 * 1000,
   showArchives: true,
-  showBackButton: true, // show back button in post detail
+  showBackButton: true,
   editPost: {
-    enabled: true,
+    enabled: false,
     text: "Edit page",
-    url: "https://github.com/satnaing/astro-paper/edit/main/",
+    url: "https://github.com/rwjapanese/realworldjapanese/edit/main/",
   },
   dynamicOgImage: true,
-  dir: "ltr", // "rtl" | "auto"
-  lang: "en", // html lang code. Set this empty and default will be "en"
-  timezone: "Asia/Bangkok", // Default global timezone (IANA format) https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  dir: "ltr",
+  lang: DEFAULT_LANGUAGE,
+  timezone: "Asia/Tokyo",
 } as const;

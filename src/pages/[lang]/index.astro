@@ -1,0 +1,135 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Socials from "@/components/Socials.astro";
+import LinkButton from "@/components/LinkButton.astro";
+import Card from "@/components/Card.astro";
+import getSortedPosts from "@/utils/getSortedPosts";
+import IconRss from "@/assets/icons/IconRss.svg";
+import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+import { SITE } from "@/config";
+import { SOCIALS } from "@/constants";
+import { filterByLang, withLang, getLangStaticPaths } from "@/utils/i18n";
+import type { LanguageCode } from "@/config/languages";
+
+export async function getStaticPaths() {
+  return getLangStaticPaths();
+}
+
+const { lang } = Astro.params as { lang: LanguageCode };
+
+const allBlog = await getCollection("blog");
+const allGuides = await getCollection("guides");
+const allEntries = [...allBlog, ...allGuides];
+const posts = filterByLang(allEntries, lang);
+const sortedPosts = getSortedPosts(posts);
+const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
+const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
+
+const heroCopy = {
+  en: {
+    tagline: "Real phrases for real Japanese workplaces.",
+    body: "Stop sounding rude at work. Our A/B/C politeness framework shows you the three versions of every phrase — and exactly when to use each one.",
+    allPosts: "All Posts",
+    socials: "Social Links:",
+  },
+  ja: {
+    tagline: "日本のビジネス現場で本当に使われる言葉を。",
+    body: "メールで「失礼な人」になっていませんか？ A/B/C の敬語フレームワークで、同じ意味の3パターンを使い分けられるようになります。",
+    allPosts: "記事一覧",
+    socials: "ソーシャル:",
+  },
+};
+
+const copy = heroCopy[lang as "en" | "ja"] ?? heroCopy.en;
+---
+
+<Layout>
+  <Header />
+  <main id="main-content" data-layout="index" class="app-layout">
+    <section id="hero" class:list={["pt-8 pb-6", "border-b border-border"]}>
+      <h1 class="my-4 inline-block text-4xl font-bold sm:my-8 sm:text-5xl">
+        Real-World Japanese
+      </h1>
+      <a
+        target="_blank"
+        href={withLang(lang, "rss.xml")}
+        class="inline-block"
+        aria-label="rss feed"
+        title="RSS Feed"
+      >
+        <IconRss
+          width={20}
+          height={20}
+          class="scale-125 stroke-accent stroke-3 rtl:-rotate-90"
+        />
+        <span class="sr-only">RSS Feed</span>
+      </a>
+
+      <p class="mt-2 text-lg font-medium">{copy.tagline}</p>
+      <p class="mt-4">{copy.body}</p>
+
+      {
+        SOCIALS.length > 0 && (
+          <div class="mt-4 flex max-sm:flex-col sm:items-center">
+            <div class="me-2 mb-1 whitespace-nowrap sm:mb-0">{copy.socials}</div>
+            <Socials />
+          </div>
+        )
+      }
+    </section>
+
+    {
+      featuredPosts.length > 0 && (
+        <section
+          id="featured"
+          class:list={[
+            "pt-12 pb-6",
+            { "border-b border-border": recentPosts.length > 0 },
+          ]}
+        >
+          <h2 class="text-2xl font-semibold tracking-wide">Featured</h2>
+          <ul>
+            {featuredPosts.map(data => (
+              <Card variant="h3" {...data} />
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      recentPosts.length > 0 && (
+        <section id="recent-posts" class="pt-12 pb-6">
+          <h2 class="text-2xl font-semibold tracking-wide">Recent Posts</h2>
+          <ul>
+            {recentPosts.map(
+              (data, index) =>
+                index < SITE.postPerIndex && <Card variant="h3" {...data} />
+            )}
+          </ul>
+        </section>
+      )
+    }
+
+    <div class="my-8 text-center">
+      <LinkButton href={withLang(lang, "posts")}>
+        {copy.allPosts}
+        <IconArrowRight class="inline-block rtl:-rotate-180" />
+      </LinkButton>
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const indexLayout = (document.querySelector("#main-content") as HTMLElement)
+      ?.dataset?.layout;
+    if (indexLayout) {
+      sessionStorage.setItem("backUrl", "/");
+    }
+  });
+</script>

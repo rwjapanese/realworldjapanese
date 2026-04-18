@@ -7,19 +7,36 @@ import IconSunHigh from "@/assets/icons/IconSunHigh.svg";
 import IconMenuDeep from "@/assets/icons/IconMenuDeep.svg";
 import LinkButton from "./LinkButton.astro";
 import { SITE } from "@/config";
+import { getCurrentLang, stripLangPrefix, withLang } from "@/utils/i18n";
+import { ACTIVE_LANGUAGES, getLanguageLabel } from "@/config/languages";
 
 const { pathname } = Astro.url;
+const currentLang = getCurrentLang(pathname);
+const pathWithoutLang = stripLangPrefix(pathname);
 
-// Remove trailing slash from current pathname if exists
 const currentPath =
   pathname.endsWith("/") && pathname !== "/" ? pathname.slice(0, -1) : pathname;
 
 const isActive = (path: string) => {
-  const currentPathArray = currentPath.split("/").filter(p => p.trim());
-  const pathArray = path.split("/").filter(p => p.trim());
-
-  return currentPath === path || currentPathArray[0] === pathArray[0];
+  const normalized = path.endsWith("/") && path !== "/" ? path.slice(0, -1) : path;
+  return (
+    currentPath === normalized ||
+    currentPath.startsWith(normalized + "/")
+  );
 };
+
+const homeHref = withLang(currentLang);
+const postsHref = withLang(currentLang, "posts");
+const tagsHref = withLang(currentLang, "tags");
+const aboutHref = withLang(currentLang, "about");
+const archivesHref = withLang(currentLang, "archives");
+const searchHref = withLang(currentLang, "search");
+
+const menuLabels: Record<string, { posts: string; tags: string; about: string }> = {
+  en: { posts: "Posts", tags: "Tags", about: "About" },
+  ja: { posts: "記事", tags: "タグ", about: "について" },
+};
+const labels = menuLabels[currentLang] ?? menuLabels.en;
 ---
 
 <a
@@ -43,7 +60,7 @@ const isActive = (path: string) => {
     ]}
   >
     <a
-      href="/"
+      href={homeHref}
       class="absolute py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none"
     >
       {SITE.title}
@@ -66,35 +83,35 @@ const isActive = (path: string) => {
         id="menu-items"
         class:list={[
           "mt-4 grid w-44 grid-cols-2 place-content-center gap-2",
-          "[&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium [&>li>a]:hover:text-accent sm:[&>li>a]:px-2 sm:[&>li>a]:py-1",
+          "[&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium [&>li>a]:whitespace-nowrap [&>li>a]:hover:text-accent sm:[&>li>a]:px-2 sm:[&>li>a]:py-1",
           "hidden",
           "sm:mt-0 sm:flex sm:w-auto sm:gap-x-5 sm:gap-y-0",
         ]}
       >
         <li class="col-span-2">
-          <a href="/posts" class:list={{ "active-nav": isActive("/posts") }}>
-            Posts
+          <a href={postsHref} class:list={{ "active-nav": isActive(postsHref) }}>
+            {labels.posts}
           </a>
         </li>
         <li class="col-span-2">
-          <a href="/tags" class:list={{ "active-nav": isActive("/tags") }}>
-            Tags
+          <a href={tagsHref} class:list={{ "active-nav": isActive(tagsHref) }}>
+            {labels.tags}
           </a>
         </li>
         <li class="col-span-2">
-          <a href="/about" class:list={{ "active-nav": isActive("/about") }}>
-            About
+          <a href={aboutHref} class:list={{ "active-nav": isActive(aboutHref) }}>
+            {labels.about}
           </a>
         </li>
         {
           SITE.showArchives && (
             <li class="col-span-2">
               <LinkButton
-                href="/archives"
+                href={archivesHref}
                 class:list={[
                   "focus-outline flex justify-center p-3 sm:p-1",
                   {
-                    "active-nav [&>svg]:stroke-accent": isActive("/archives"),
+                    "active-nav [&>svg]:stroke-accent": isActive(archivesHref),
                   },
                 ]}
                 title="Archives"
@@ -108,10 +125,10 @@ const isActive = (path: string) => {
         }
         <li class="col-span-1 flex items-center justify-center">
           <LinkButton
-            href="/search"
+            href={searchHref}
             class:list={[
               "focus-outline flex p-3 sm:p-1",
-              { "[&>svg]:stroke-accent": isActive("/search") },
+              { "[&>svg]:stroke-accent": isActive(searchHref) },
             ]}
             title="Search"
             aria-label="search"
@@ -120,6 +137,24 @@ const isActive = (path: string) => {
             <span class="sr-only">Search</span>
           </LinkButton>
         </li>
+        {
+          ACTIVE_LANGUAGES.length > 1 && (
+            <li class="col-span-2 flex items-center justify-center gap-2 text-sm">
+              {ACTIVE_LANGUAGES.map(l => (
+                <a
+                  href={withLang(l.code, pathWithoutLang)}
+                  class:list={[
+                    "whitespace-nowrap hover:text-accent",
+                    { "font-bold text-accent": l.code === currentLang },
+                  ]}
+                  hreflang={l.htmlLang}
+                >
+                  {getLanguageLabel(l.code)}
+                </a>
+              ))}
+            </li>
+          )
+        }
         {
           SITE.lightAndDarkMode && (
             <li class="col-span-1 flex items-center justify-center">
@@ -164,6 +199,5 @@ const isActive = (path: string) => {
 
   toggleNav();
 
-  // Runs on view transitions navigation
   document.addEventListener("astro:after-swap", toggleNav);
 </script>

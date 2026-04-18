@@ -1,36 +1,77 @@
-import { BLOG_PATH } from "@/content.config";
+import { BLOG_PATH, GUIDES_PATH, PRODUCTS_PATH } from "@/content.config";
 import { slugifyStr } from "./slugify";
+import { ACTIVE_LANGUAGES } from "@/config/languages";
+import { getEntryLang, withLang } from "./i18n";
+
+const ACTIVE_LANG_CODES = ACTIVE_LANGUAGES.map(l => l.code);
+
+type CollectionPaths = {
+  sourcePath: string;
+  urlBase: string;
+};
+
+const COLLECTIONS: CollectionPaths[] = [
+  { sourcePath: BLOG_PATH, urlBase: "posts" },
+  { sourcePath: GUIDES_PATH, urlBase: "guides" },
+  { sourcePath: PRODUCTS_PATH, urlBase: "products" },
+];
+
+function resolveCollection(filePath: string | undefined): CollectionPaths {
+  if (!filePath) return COLLECTIONS[0];
+  return (
+    COLLECTIONS.find(c => filePath.includes(c.sourcePath)) ?? COLLECTIONS[0]
+  );
+}
 
 /**
- * Get full path of a blog post
- * @param id - id of the blog post (aka slug)
- * @param filePath - the blog post full file location
- * @param includeBase - whether to include `/posts` in return value
- * @returns blog post path
+ * Get the full language-aware path of a content entry.
+ *
+ * Examples:
+ *   id = "en/welcome", filePath = "src/data/blog/en/welcome.md"
+ *     → "/en/posts/welcome/"
+ *   id = "ja/keigo-guide", filePath = "src/data/guides/ja/keigo-guide.mdx"
+ *     → "/ja/guides/keigo-guide/"
+ *
+ * @param id - content entry id (language-prefixed)
+ * @param filePath - absolute filepath from glob loader
+ * @param includeBase - whether to include the collection url base (e.g. `posts`)
  */
 export function getPath(
   id: string,
   filePath: string | undefined,
   includeBase = true
 ) {
+  const lang = getEntryLang(id);
+  const { sourcePath, urlBase } = resolveCollection(filePath);
+
   const pathSegments = filePath
-    ?.replace(BLOG_PATH, "")
+    ?.replace(sourcePath, "")
     .split("/")
-    .filter(path => path !== "") // remove empty string in the segments ["", "other-path"] <- empty string will be removed
-    .filter(path => !path.startsWith("_")) // exclude directories start with underscore "_"
-    .slice(0, -1) // remove the last segment_ file name_ since it's unnecessary
-    .map(segment => slugifyStr(segment)); // slugify each segment path
+    .filter(path => path !== "")
+    .filter(path => !path.startsWith("_"))
+    .filter(
+      path =>
+        !ACTIVE_LANG_CODES.includes(path as (typeof ACTIVE_LANG_CODES)[number])
+    )
+    .slice(0, -1)
+    .map(segment => slugifyStr(segment));
 
-  const basePath = includeBase ? "/posts" : "";
+  const basePath = includeBase ? urlBase : "";
 
-  // Making sure `id` does not contain the directory
-  const blogId = id.split("/");
-  const slug = blogId.length > 0 ? blogId.slice(-1) : blogId;
+  const entryIdSegments = id.split("/");
+  const slug =
+    entryIdSegments.length > 0 ? entryIdSegments.slice(-1) : entryIdSegments;
 
-  // If not inside the sub-dir, simply return the file path
-  if (!pathSegments || pathSegments.length < 1) {
-    return [basePath, slug].join("/");
+  const tail =
+    !pathSegments || pathSegments.length < 1
+      ? [basePath, ...slug]
+      : [basePath, ...pathSegments, ...slug];
+
+  const joined = tail.filter(Boolean).join("/");
+
+  if (!includeBase) {
+    return joined;
   }
 
-  return [basePath, ...pathSegments, slug].join("/");
+  return withLang(lang, joined);
 }

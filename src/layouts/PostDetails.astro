@@ -15,9 +15,11 @@ import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
 import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
 import { SITE } from "@/config";
 
+type ContentEntry = CollectionEntry<"blog"> | CollectionEntry<"guides">;
+
 type Props = {
-  post: CollectionEntry<"blog">;
-  posts: CollectionEntry<"blog">[];
+  post: ContentEntry;
+  posts: ContentEntry[];
 };
 
 const { post, posts } = Astro.props;
@@ -48,7 +50,7 @@ if (typeof initOgImage === "string") {
 
 // Use dynamic OG image if enabled and no remote|local ogImage
 if (!ogImageUrl && SITE.dynamicOgImage) {
-  ogImageUrl = `${getPath(post.id, post.filePath)}/index.png`;
+  ogImageUrl = `${getPath(post.id, post.filePath)}index.png`;
 }
 
 // Resolve OG image URL (or fallback to SITE.ogImage / default `og.png`)

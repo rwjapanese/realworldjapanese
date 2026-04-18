@@ -58,7 +58,7 @@
       }
 
       th {
-        @apply py-1.5;
+        @apply py-1.5 whitespace-nowrap;
       }
 
       code {

@@ -1,0 +1,60 @@
+---
+description: ROADMAP-driven workflow for content + SEO work on this site
+alwaysApply: true
+---
+
+# ROADMAP-driven workflow
+
+This project uses `specs/ROADMAP.md` as the single source of truth for
+cross-session TODOs. Follow this workflow every session.
+
+## On session start
+
+1. **Read `specs/ROADMAP.md` first.** It documents current state, live articles,
+   skills available, and prioritized TODOs (P0 → P3).
+2. For article-specific context, open `specs/articles/<slug>.spec.md` §11
+   Change Log.
+3. For skill invocation, see `work/AEIOU/marketing/SEO.md` §6 (or the symlinked
+   skill docs in `~/.cursor/skills/`).
+
+## When the user gives you a task
+
+- If the task matches an existing P0/P1/P2 item in ROADMAP.md, announce which
+  item you're picking up.
+- If it's a brand-new task, add it to ROADMAP.md §"Active TODOs" at the right
+  priority level before starting.
+
+## When you finish a task
+
+Always update ROADMAP.md in the same response:
+
+1. Tick the TODO checkbox (`- [ ]` → `- [x]`).
+2. Append a dated row to §"Recent decisions" (one-line summary).
+3. If the work revealed new TODOs, add them under the correct priority.
+
+For article edits, also update the article's `specs/articles/<slug>.spec.md`
+§11 Change Log with the same dated entry.
+
+## Scope
+
+- **ROADMAP.md** tracks cross-article / infrastructure / skill TODOs.
+- **`<slug>.spec.md` §11** tracks per-article edits.
+- Don't duplicate entries across both. Project-wide → ROADMAP. Article-specific
+  → spec.
+
+## Skills available in this repo
+
+- `seo-article-outline` — new article SERP spec generation
+- `seo-article-localize` — multi-language SERP diff evaluation
+- `ja-article-style` — JA mechanical linter (`normalize_ja.py`)
+- `en-article-style` — EN mechanical linter + SEO/CVR checklist (`normalize_en.py`)
+
+Invoke by natural language — e.g. "校正して" triggers the right style skill
+based on file path.
+
+## Non-negotiables
+
+- Never touch `CHANGELOG.md` at the repo root (upstream AstroPaper auto-gen).
+- Never edit the frontmatter block of an article (`---` block) via the style
+  linter script.
+- Never add emoji to article prose unless the user asks.
