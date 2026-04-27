@@ -43,10 +43,23 @@ last_serp_audit: "YYYY-MM-DD"             # Last time we re-ran SERP analysis
 > - Humans review and refine the "Our Differentiation" and "primary_info_seeds" sections.
 > - When SERP changes significantly, re-run the skill to refresh sections 2–4.
 > - Do NOT delete the spec after publication — it's the source of truth for updates.
+>
+> **Bilingual convention (2026-04-27 onward)**
+> Sections 1, 4, 5, and 7 MUST be written in both **JA and EN**. JA goes first (primary review version for the human author), EN second. Sections 2, 3, 6, 8, 9, 10, 11 stay in EN only — they are mechanical / reference material.
 
 ---
 
 ## 1. Target & Intent
+
+### JA
+
+**主要な検索意図:** _「<keyword>」を検索したユーザーが本当に達成したいことは何か？_
+
+**読者ペルソナ:** _このクエリを打つ人物の一文記述。_
+
+**成功基準:** _読者が「目的を達成できた」と感じるためには、この記事はどの問いに答える必要があるか？_
+
+### EN
 
 **Primary search intent:** _What is the user actually trying to accomplish when they search "<keyword>"?_
 
@@ -106,6 +119,14 @@ last_serp_audit: "YYYY-MM-DD"             # Last time we re-ran SERP analysis
 
 > What top-10 articles collectively fail to cover, but the searcher likely wants.
 
+### JA
+
+1. ...
+2. ...
+3. ...
+
+### EN
+
 1. ...
 2. ...
 3. ...
@@ -115,6 +136,13 @@ last_serp_audit: "YYYY-MM-DD"             # Last time we re-ran SERP analysis
 ## 5. Our Differentiation
 
 > Our unique angle. What makes this article rank above the top 10, not just match them?
+
+### JA
+
+- ...
+- ...
+
+### EN
 
 - ...
 - ...
@@ -149,6 +177,19 @@ last_serp_audit: "YYYY-MM-DD"             # Last time we re-ran SERP analysis
 ## 7. Target Article Outline
 
 > The final outline for OUR article. Derived from sections 3–5.
+
+### JA outline (target)
+
+1. H1: _<日本語タイトル案>_
+2. H2: この記事を読むべき人
+3. H2: <セクション1>
+   - H3: <サブセクション>
+4. H2: <セクション2>
+5. ...
+6. H2: よくある質問
+7. H2: CTA / 関連記事
+
+### EN outline (target)
 
 1. H1: _<Working title>_
 2. H2: Intro — who should read this

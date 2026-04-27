@@ -5,7 +5,7 @@ Project-wide TODO tracker for Real-World Japanese content + SEO infrastructure.
 **Use this file to resume context between AI sessions (Cursor / Claude Code).**
 Open it first, read "How to resume" at the top, then act.
 
-Last updated: 2026-04-18
+Last updated: 2026-04-27
 
 ---
 
@@ -30,10 +30,11 @@ The user reads this file when they open a new chat. Keep it scannable.
 ## Current state
 
 ### Site
-- Domain: `realworldjapanese.com` (planned — Cloudflare Pages deploy pending; current状態: localhost のみ検証済み)
+- Domain: `realworldjapanese.com` **LIVE** (Cloudflare Pages 2026-04-18 デプロイ完了)
+  - apex → `/en/` 301、`www` → apex 301（Redirect Rule、query string 保持）、SSL 自動発行
 - Default language: `/en/` (primary), `/ja/` (secondary), `/vi/ /id/ /pt/ /th/ /zh-TW/` (scaffolded, not active)
 - Stack: Astro + AstroPaper theme + MDX content collections
-- Analytics: GSC + GA4 未設定（配線だけ済み — `PUBLIC_GOOGLE_SITE_VERIFICATION` + `PUBLIC_GA_MEASUREMENT_ID` を env に入れれば有効化）
+- Analytics: **GSC + GA4 設定完了**（GA4 `G-1YCT3NQ46J` ライブ計測中、GSC ドメインプロパティ検証済み・サイトマップ送信済み・5 URL インデックス登録リクエスト済み）
 - Deploy 手順書: `specs/deploy-checklist.md`
 
 ### Live articles
@@ -57,24 +58,17 @@ The user reads this file when they open a new chat. Keep it scannable.
 
 ### P0 — Blocks next meaningful launch
 
-- [ ] **Step 9: Cloudflare Pages デプロイ** (`specs/deploy-checklist.md` §9).
-  - 9-1 GitHub push / 9-2 Pages 接続 / 9-3 カスタムドメイン / 9-4 www→apex 301 / 9-5 動作確認
-  - AI 側の準備（build green, sitemap, robots, `PUBLIC_GA_MEASUREMENT_ID` 配線, `.env.example`）は完了
-  - ここから先はユーザー手動（GitHub / Cloudflare / DNS ダッシュボード操作）
+- [x] **Step 9: Cloudflare Pages デプロイ** 完了（2026-04-18）
+  - 9-1〜9-5 全て green、`https://realworldjapanese.com/` 本番稼働中
 
-- [ ] **Step 10: GSC + サイトマップ + GA4** (`specs/deploy-checklist.md` §10).
-  - 10-1 GA4 プロパティ作成 → 測定 ID 取得
-  - 10-2 `PUBLIC_GA_MEASUREMENT_ID` を Cloudflare env に設定 → 再デプロイ
-  - 10-3 GA4 リアルタイム動作確認
-  - 10-4 GSC ドメインプロパティ検証（DNS TXT）
-  - 10-5 `sitemap-index.xml` 送信
-  - 10-6 5 URL のインデックス登録リクエスト
+- [x] **Step 10: GSC + サイトマップ + GA4** 完了（2026-04-18）
+  - GA4 測定 ID `G-1YCT3NQ46J` を `PUBLIC_GA_MEASUREMENT_ID` として配信 → リアルタイム計測動作確認済み
+  - GSC ドメインプロパティは Cloudflare Registrar 経由で即自動検証（TXT 不要）
+  - サイトマップ送信済み・主要 5 URL のインデックス登録リクエスト完了
 
-- [ ] **Next article selection.** Decide the slug for article #2 from SEO.md priority matrix (§4-5). Top candidates:
-  - `japanese-business-email-template` (★2 priority, low competition, product-adjacent)
-  - `keigo-cheat-sheet` (★1 priority, PDF-format SEO intent, highest CVR)
-  - `japanese-self-introduction-business` (★5 priority, high-volume, new-arrival intent)
-  - Run `seo-article-outline` once decided.
+- [x] **Next article selection.** Decided on **`business-email-template`** (★2 priority per SEO.md §4-5). Spec generated 2026-04-27 via `seo-article-outline` → `specs/articles/business-email-template.spec.md`.
+
+- [x] **Article #2 drafting.** JA body shipped 2026-04-27 (~3,500字、`ja-article-style` pass)。EN body shipped 2026-04-27 (~2,800 words、`en-article-style` pass)。`seo-article-localize` 判定で EN diff 不要を確認（base spec が en-SERP-rooted）。両言語とも `status: drafting`。次は Featured-snippet 段落チェック (`keigo-guide` 同様の P1 タスク) と本番デプロイ前の手動レビュー。
 
 ### P1 — Known issues on shipped content
 
@@ -144,6 +138,10 @@ The user reads this file when they open a new chat. Keep it scannable.
 | 2026-04-18 | Created `specs/ROADMAP.md` (this file) to persist cross-session context. | this session |
 | 2026-04-18 | Added `AGENTS.md` (repo root) + `.cursor/rules/roadmap-workflow.mdc` + `CLAUDE.md` symlink so every Cursor / Claude Code session auto-reads ROADMAP.md and auto-updates it on task completion. No manual handoff needed. | this session |
 | 2026-04-18 | Deploy 準備: `pnpm build` green / `sitemap-index.xml` + `robots.txt` 検証 / `Layout.astro` に GA4 (`PUBLIC_GA_MEASUREMENT_ID`) 条件付き挿入 / `astro.config.ts` env schema 追加 / `.env.example` 作成 / `specs/deploy-checklist.md` にユーザー手動作業（Cloudflare / GSC / GA4）の具体手順を作成. | this session |
+| 2026-04-18 | **Step 9 完了: `realworldjapanese.com` 本番稼働開始**. Cloudflare Registrar で domain 取得 → Pages プロジェクト作成（NODE_VERSION=20, Astro preset, dist output）→ CNAME `@` / `www` を Proxied 設定 → Redirect Rule「WWW to root」で www→apex 301 + query string 保持. 全動作検証 pass: www/apex/クエリ保持/JA+EN記事配信. | this session |
+| 2026-04-18 | **Step 10 完了: アナリティクス & サーチエンジン登録全完了**. GA4 プロパティ `Real-World Japanese` 作成 → 測定 ID `G-1YCT3NQ46J` を `PUBLIC_GA_MEASUREMENT_ID` として Cloudflare env 反映 → 再デプロイで gtag 配信確認（57 秒ビルド）→ リアルタイム計測 1 ユーザー表示 OK. GSC ドメインプロパティは Cloudflare Registrar 経由で自動検証成功（TXT 不要）. サイトマップ `https://realworldjapanese.com/sitemap-index.xml` 送信 → インデックス正常処理. 主要 5 URL（apex/ja/en/ja-keigo-guide/en-keigo-guide）インデックス登録リクエスト完了. **MVP ローンチ完了。** | this session |
+| 2026-04-27 | **Article #2 spec generated** (`business-email-template.spec.md`). ★2 priority per SEO.md. Top 10 SERP fetched (TCJ / Coto / Migaku / Nihongo-Career / JapaneseKeigo-Webnode / Daijob / ScalingYourCompany / Wasabi / NihongoKnow / Kizuna). Major content gaps identified: internal vs external split (1/10), 15–25 char line-break rule (1/10), Cc/Bcc/各位 (1/10), Slack/Teams adjacent etiquette (0/10), recovery moves after wrong-register email (0/10), template decision tree (0/10). Differentiation reuses A/B/C politeness framework from keigo-guide → applied to email register selection with 8–10 templates tagged by level + scenario. 3 primary_info_seeds initialized (real-email error scrub, HR tolerance interviews, template-download analytics). Status: `drafting`. | seo-article-outline + ryoooue |
+| 2026-04-27 | **Bilingual spec convention adopted.** Sections 1 (Target & Intent), 4 (Content Gaps), 5 (Our Differentiation), 7 (Target Article Outline) MUST now be written in BOTH JA and EN (`### JA` / `### EN` sub-headings, JA first). Sections 2/3/6/8/9/10/11 stay EN-only (mechanical/reference). Reason: the human author reviews specs in JA before drafting; an EN-only spec hides direction errors until body-write time. Updated: `specs/articleSpec.template.md`, `~/.claude/skills/seo-article-outline/templates/articleSpec.default.md`, `~/.claude/skills/seo-article-outline/SKILL.md` (Step 6 + Step 9 instructions). Back-filled JA into `business-email-template.spec.md` §1 §4 §5 (§7 already bilingual). | ryoooue |
 
 ---
 
