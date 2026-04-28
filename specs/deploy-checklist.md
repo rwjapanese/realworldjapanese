@@ -162,16 +162,16 @@ GSC → URL 検査で以下を順に実行:
 
 ## 完了判定
 
-- [ ] 9-1 GitHub push 完了
-- [ ] 9-2 Cloudflare Pages 初回デプロイ green
-- [ ] 9-3 `realworldjapanese.com` / `www.realworldjapanese.com` 両方が SSL + Cloudflare 経由
-- [ ] 9-4 `www` → apex の 301 が効いている
-- [ ] 9-5 5 URL すべて 200（または www から 301）
-- [ ] 10-1 GA4 プロパティ + 測定 ID 取得
-- [ ] 10-2 `PUBLIC_GA_MEASUREMENT_ID` を Cloudflare に設定して再デプロイ
-- [ ] 10-3 GA4 リアルタイムで自分のアクセスが見える
-- [ ] 10-4 GSC ドメインプロパティ検証済み
-- [ ] 10-5 サイトマップ送信済み
-- [ ] 10-6 5 URL の URL 検査 + インデックス登録リクエスト完了
+- [x] 9-1 GitHub push 完了（2026-04-18, `f300532..c330717 main -> main`）
+- [x] 9-2 Cloudflare Pages 初回デプロイ green（2026-04-18, `realworldjapanese.pages.dev` / 全 URL 200）
+- [x] 9-3 カスタムドメイン接続（2026-04-18, `realworldjapanese.com` Active + SSL enabled, CNAME @ / www を DNS 追加済み）
+- [x] 9-4 `www → apex` 301 リダイレクト（2026-04-18, Redirect Rule "Redirect from WWW to root [Template]" Active, Preserve query string ON）
+- [x] 9-5 動作確認（2026-04-18, 全テスト pass: www→apex 301, クエリ保持, apex→/en/ 301, /ja/guides/keigo-guide/ 200 with correct title）
+- [x] 10-1 GA4 プロパティ + 測定 ID 取得（2026-04-18, 測定 ID `G-1YCT3NQ46J`）
+- [x] 10-2 `PUBLIC_GA_MEASUREMENT_ID` を Cloudflare env に設定して再デプロイ（2026-04-18, build success in 57s）
+- [x] 10-3 GA4 リアルタイムで自分のアクセスが見える（2026-04-18, Japan アクティブユーザー 1 確認）
+- [x] 10-4 GSC ドメインプロパティ検証済み（2026-04-18, Cloudflare Registrar 経由で即自動検証）
+- [x] 10-5 サイトマップ送信済み（2026-04-18, `https://realworldjapanese.com/sitemap-index.xml` → サイトマップインデックス正常処理）
+- [x] 10-6 5 URL の URL 検査 + インデックス登録リクエスト完了（2026-04-18）
 
-全部チェックが付いたら MVP ローンチ完了。`土日のコミット.md` の Step 9・10 と `specs/ROADMAP.md` の該当タスクを更新する。
+🎉 **MVP ローンチ完了（2026-04-18 土曜日）**。
