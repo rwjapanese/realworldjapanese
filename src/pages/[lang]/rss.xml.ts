@@ -12,7 +12,9 @@ export async function getStaticPaths() {
 
 export async function GET({ params }: { params: { lang: string } }) {
   const lang = isValidLanguage(params.lang) ? params.lang : "en";
-  const posts = await getCollection("blog");
+  const blog = await getCollection("blog");
+  const guides = await getCollection("guides");
+  const posts = [...blog, ...guides];
   const langPosts = filterByLang(posts, lang);
   const sortedPosts = getSortedPosts(langPosts);
   return rss({

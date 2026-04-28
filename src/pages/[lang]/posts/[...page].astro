@@ -13,7 +13,9 @@ import { ACTIVE_LANGUAGES } from "@/config/languages";
 import { filterByLang } from "@/utils/i18n";
 
 export const getStaticPaths = (async ({ paginate }) => {
-  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  const blog = await getCollection("blog", ({ data }) => !data.draft);
+  const guides = await getCollection("guides", ({ data }) => !data.draft);
+  const posts = [...blog, ...guides];
   return ACTIVE_LANGUAGES.flatMap(l => {
     const langPosts = filterByLang(posts, l.code);
     const sorted = getSortedPosts(langPosts);

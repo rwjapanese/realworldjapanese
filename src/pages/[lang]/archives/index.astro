@@ -20,7 +20,9 @@ if (!SITE.showArchives) {
   return Astro.redirect(`/${lang}/`);
 }
 
-const allPosts = await getCollection("blog", ({ data }) => !data.draft);
+const allBlog = await getCollection("blog", ({ data }) => !data.draft);
+const allGuides = await getCollection("guides", ({ data }) => !data.draft);
+const allPosts = [...allBlog, ...allGuides];
 const posts = filterByLang(allPosts, lang);
 
 const months = [

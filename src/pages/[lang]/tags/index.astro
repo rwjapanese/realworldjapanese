@@ -16,7 +16,9 @@ export async function getStaticPaths() {
 
 const { lang } = Astro.params as { lang: LanguageCode };
 
-const allPosts = await getCollection("blog");
+const allBlog = await getCollection("blog");
+const allGuides = await getCollection("guides");
+const allPosts = [...allBlog, ...allGuides];
 const posts = filterByLang(allPosts, lang);
 
 let tags = getUniqueTags(posts);
