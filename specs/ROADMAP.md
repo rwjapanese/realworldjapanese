@@ -5,7 +5,7 @@ Project-wide TODO tracker for Real-World Japanese content + SEO infrastructure.
 **Use this file to resume context between AI sessions (Cursor / Claude Code).**
 Open it first, read "How to resume" at the top, then act.
 
-Last updated: 2026-04-28
+Last updated: 2026-05-11
 
 ---
 
@@ -46,6 +46,7 @@ The user reads this file when they open a new chat. Keep it scannable.
 | `japanese-self-introduction-business` | ✅ published | ✅ published | `specs/articles/japanese-self-introduction-business.spec.md` | 2026-04-27 |
 | `keigo-examples` | ✅ published | ✅ published | `specs/articles/keigo-examples.spec.md` | 2026-04-28 |
 | `japanese-business-phrases-pdf` | ✅ published | ✅ published | `specs/articles/japanese-business-phrases-pdf.spec.md` | 2026-04-28 |
+| `keigo-mistakes` | ✅ published | ✅ published | `specs/articles/keigo-mistakes.spec.md` | 2026-05-11 |
 
 ### Product
 - **Essential 30 PDF** on Gumroad: https://rwjapanese.gumroad.com/l/essential-30
@@ -167,6 +168,7 @@ The user reads this file when they open a new chat. Keep it scannable.
 | 2026-04-28 | **Article #6 JA v1 shipped** (`/ja/guides/japanese-business-phrases-pdf/`). ~14,070 chars (含ローマ字)、342 lines、`ja-article-style` linter idempotent pass、`pnpm build` green、サイトマップ登録済。実装：読者本人視点ペルソナ4項目 → A/B/C 凡例 + uchi-soto + 誤用列の見方 → 10シーン × A/B/C × コピペ完成形 + 誤用注意 → 頻度順 Top30 (6列) → クッション言葉 7 種 → メール8 / 電話6 / 会議6 → 5誤用 → PDF保存方法 (Cmd+P, Phase 2 mobile-vertical 予告) → 関連リンク 4 sibling + Essential 30 CTA → FAQ 5件。タイトル「ビジネス日本語フレーズ集｜シーン別30選・PDFで保存できる早見表」(日常語ルール、"PDF" KW 含む)。差別化の4ゼロカバレッジ・ギャップ全て実装：scenario × A/B/C matrix (0/10 → 10シーン) / frequency-ranked top 30 (0/10 → 6列ランキング) / mistake-pair on row (0/10 → 各シーン誤用注意 + Top30 誤用列) / clean PDF-save UX (0/10 → Cmd+P 案内 + Phase 2 公式 PDF 予告)。**次：人間レビュー待ち** → JA v2 → `seo-article-localize` → EN v1。EN は JA レビュー前に着手しない。並列でPhase 1の他記事と進めて問題ないが、ROADMAP統合は片側にまとめるのが安全（本日 keigo-examples spec と並列実行で File modified エラー1回発生）。| Claude Opus 4.7 + ryoooue |
 | 2026-04-28 | **Article #6 EN v1 shipped** (`/en/guides/japanese-business-phrases-pdf/`). ~3,950 words、350 lines、`en-article-style` linter idempotent pass after 8 weak-qualifier corrections（*just*×4 / *very*×1 / *actually*×2 を別表現に置換）、`pnpm build` green at 14 indexed pages、サイトマップ登録済。**ユーザー明示要望で JA v1 と同セッション一気通貫実行**（feedback_article_writing_workflow.md 例外条項：「JA も EN もまとめて作って」と明示時のみ）。base spec が en-SERP-rooted のため `seo-article-localize` 判定スキップ（`business-email-template` と同じ判断）。タイトル "Japanese Business Phrases PDF: 30 Scenarios at 3 Politeness Levels" (66 chars、exact-match KW + benefit promise)。en-article-style ルール A1–D7 全準拠：em-dash + spaces / en-dash for ranges (N3–N2) / Oxford comma / sentence-case H2/H3 / italic *romaji* + (kanji) on first use / Hepburn macrons (ō/ū) / 40–60-word featured-snippet 段落 / persona hooks 4 bullets / 4-sentence paragraph cap / bold key phrase / FAQ 5 H3 / descriptive anchors。Hook lead で boss-greeting freeze + ryōkai correction story を使い、CVR を意識した冒頭。**次：JA v1 の人間レビュー待ち**。JA v2 で修正が入る場合、対応箇所を EN v1 にもバックポートする手順が必要（このサイクルが Article #5 keigo-examples と同じパターン）。| Claude Opus 4.7 + ryoooue |
 | 2026-04-28 | **Articles #5 + #6 published 一括リリース**. `keigo-examples` (JA + EN) と `japanese-business-phrases-pdf` (JA + EN) の両 spec で `status: drafting` → `published`、`languages.{en,ja}.status` も `published` に更新。ROADMAP Live articles 表で両記事を ✅ published に。両記事は frontmatter `draft: false` 設定済のため git push で Cloudflare Pages auto-build → 反映予定。**Phase 1 進捗 6/7（86%）**：live = 6記事 (`keigo-guide` / `business-email-template` / `keigo-cheat-sheet` / `japanese-self-introduction-business` / `keigo-examples` / `japanese-business-phrases-pdf`)。残るは `keigo-mistakes` ★6 (6月中旬予定)。コミット構成：(a) `chore` deploy-checklist の MVP closeout（Step 9・10 チェックボックス反映）、(b) `feat` ship keigo-examples、(c) `feat` ship japanese-business-phrases-pdf、計 3 コミットを `main` に push。次の手は両記事の GSC URL 検査 + インデックス登録リクエスト。| ryoooue (publish trigger) + Claude Opus 4.7 |
+| 2026-05-11 | **Article #7 (`keigo-mistakes`) published — Phase 1 完了**. ★6 priority の最終記事。JA at `src/data/guides/ja/keigo-mistakes.mdx` (281 lines)、EN at `src/data/guides/en/keigo-mistakes.mdx` (286 lines)。Tier 1/2/3 重大度モデルを記事の骨組みに、A/B/C politeness framework と独立した第二軸として導入。冒頭 self-diagnostic（5問 yes/no）で読者がすぐ自分の最優先ミスを特定できる構成。spec lifecycle: `drafting` → `published`、両言語 published に flip。Phase 1 終了：**全 7 記事 live**（`keigo-guide` / `business-email-template` / `keigo-cheat-sheet` / `japanese-self-introduction-business` / `keigo-examples` / `japanese-business-phrases-pdf` / `keigo-mistakes`）。6月26日コミット計画より約1.5ヶ月先行で達成。次の手は GSC URL 検査 + インデックス登録リクエスト。| ryoooue (publish trigger) + Claude Opus 4.7 |
 
 ---
 
