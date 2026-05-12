@@ -25,6 +25,17 @@ const commonSchema = z.object({
   targetKeyword: z.string().optional(),
   slug: z.string().optional(),
   isIndexable: z.boolean().default(true),
+  // FAQs surfaced to FAQPage JSON-LD in Layout.astro. Keep each `a` as
+  // plain prose (no Markdown formatting); the schema is rendered as
+  // structured data, not as rich HTML.
+  faqs: z
+    .array(
+      z.object({
+        q: z.string(),
+        a: z.string(),
+      })
+    )
+    .optional(),
 });
 
 const blog = defineCollection({

@@ -14,6 +14,8 @@ import {
 import { getCurrentLang, stripLangPrefix } from "@/utils/i18n";
 import "@/styles/global.css";
 
+type FAQ = { q: string; a: string };
+
 type Props = {
   title?: string;
   author?: string;
@@ -25,6 +27,7 @@ type Props = {
   modDatetime?: Date | null;
   scrollSmooth?: boolean;
   noindex?: boolean;
+  faqs?: FAQ[];
 };
 
 const {
@@ -38,6 +41,7 @@ const {
   modDatetime,
   scrollSmooth = false,
   noindex = false,
+  faqs,
 } = Astro.props;
 
 const socialImageURL = new URL(ogImage, Astro.url);
@@ -69,6 +73,23 @@ const structuredData = {
   ],
   inLanguage: htmlLang,
 };
+
+const faqStructuredData =
+  faqs && faqs.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqs.map(({ q, a }) => ({
+          "@type": "Question",
+          name: q,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: a,
+          },
+        })),
+        inLanguage: htmlLang,
+      }
+    : null;
 ---
 
 <!doctype html>
@@ -155,6 +176,15 @@ const structuredData = {
       is:inline
       set:html={JSON.stringify(structuredData)}
     />
+    {
+      faqStructuredData && (
+        <script
+          type="application/ld+json"
+          is:inline
+          set:html={JSON.stringify(faqStructuredData)}
+        />
+      )
+    }
 
     <!-- Enable RSS feed auto-discovery  -->
     <link

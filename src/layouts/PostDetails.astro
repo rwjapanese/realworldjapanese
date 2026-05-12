@@ -35,6 +35,7 @@ const {
   timezone,
   tags,
   hideEditPost,
+  faqs,
 } = post.data;
 
 const { Content } = await render(post);
@@ -67,6 +68,7 @@ const layoutProps = {
   canonicalURL,
   ogImage,
   scrollSmooth: true,
+  faqs,
 };
 
 /* ========== Prev/Next Posts ========== */
