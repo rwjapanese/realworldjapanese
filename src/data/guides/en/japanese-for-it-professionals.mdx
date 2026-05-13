@@ -1,0 +1,365 @@
+---
+title: "Japanese for IT Professionals: A Working Engineer's Guide"
+description: "Practical Japanese for software engineers in Japan — phrases for standups, PR reviews, sprint planning, demos, retros, and client calls, plus a week-1 survival deck and a JLPT-to-task ladder. Two-thirds of what vocab lists never tell you."
+pubDatetime: 2026-05-13T00:00:00Z
+cluster: "tech-japanese"
+tags: ["tech-japanese", "software-engineers", "workplace", "business-japanese", "guide"]
+author: "Real-World Japanese"
+productCTA: "essential-30"
+targetKeyword: "japanese for it professionals"
+featured: false
+draft: false
+faqs:
+  - q: "Do I need Japanese to work as a software engineer in Japan?"
+    a: "No — you can ship code at many international-friendly Japanese companies without Japanese. But you'll plateau quickly. The standups, PR threads, sprint planning, and informal lunch decisions happen in Japanese even when the codebase is in English. N3 unlocks PR comments and short 1:1s; N2 unlocks facilitating retros and joining client calls. Most engineers who plateau at \"comfortable\" do so right around N3."
+  - q: "What JLPT level is needed for IT jobs in Japan?"
+    a: "The market splits at N3. Below N3 you're applying to international-friendly roles (Mercari, PayPay, Rakuten English-track, many startups). N3 doubles your pool. N2 opens almost everything except client-facing consulting and management. N1 is rarely required even for senior IC roles. For a concrete \"what unlocks at each level\" table, see the JLPT ladder section below."
+  - q: "Is katakana enough for tech work in Japan?"
+    a: "Katakana covers most token-level vocab — *taasuku* (タスク), *komitto* (コミット), *deriri-su* (デプロイ), *banbu* (バグ). What katakana doesn't cover is **the sentence around the noun**: how to ask for a PR review politely, how to flag a blocker in standup, how to push back on a sprint estimate without sounding rude. Those sit in hiragana and grammar, and that's where most engineer vocab guides go silent."
+  - q: "How do you say \"deploy\" or \"merge\" in Japanese?"
+    a: "Both are katakana loanwords: *deriri-su* / *dipuroi* (デプロイ) and *ma-ji* (マージ). The interesting part is the surrounding verb — *deplyo shimasu* (\"I'll deploy\") vs *deplyo sasete itadakimasu* (over-polite) vs *deplyo shitokimasu* (casual). Picking the right register is what this guide is about. The tokens themselves are the easy half."
+  - q: "What's the most common Japanese mistake foreign engineers make at work?"
+    a: "Using *ryōkai-desu* (了解です) in a PR comment to a senior or in a client-facing Slack channel. *Ryōkai* carries a faint top-down tone, so it's fine peer-to-peer but reads as casual upward. Swap it for *shōchi shimashita* / *shōchi itashimashita* with managers and external counterparts. This is the single highest-ROI fix most foreign engineers can make in their first month."
+---
+
+## Table of contents
+
+---
+
+Japanese for IT professionals splits across two axes most vocab lists ignore. You need (a) the right **politeness register** — *keigo*, polite, or casual — for the moment, and (b) phrases for **engineer-specific rituals**: PR reviews, standups, sprint planning, demos, retros, and client calls. This guide gives you both, plus a week-1 survival deck and a JLPT-to-task ladder.
+
+If you've already memorized 200 katakana tech terms and still freeze when asking for a PR review, you're missing the half that matters most at work. Let's fix that.
+
+---
+
+## Who this guide is for
+
+- **Software engineers onboarding at a Japanese tech company** who can already read katakana like *taasuku* (タスク) and *komitto* (コミット) but freeze when a senior asks them to review a PR in Japanese.
+- **N5–N3 engineers in their first year** who survive standups by nodding and want a concrete, paste-ready phrase deck before tomorrow morning.
+- **N2–N1 engineers** who can hold a conversation but want to upgrade their register awareness — when to use *shōchi shimashita* (承知しました) instead of *ryōkai-desu* (了解です) in a PR thread.
+- **Engineering managers and tech leads moving to Japan** who need to facilitate retros and join client calls in Japanese, not only read code.
+
+This is a **practitioner's guide**. Every phrase comes with a register tier and a ritual context — so you can find the right thing to say in the situation you face.
+
+---
+
+## Why Japanese matters for engineers — the short answer
+
+You can land an engineering job in Japan without Japanese. **You can't grow inside the team without it.** Standups, PR threads, sprint planning, post-incident reviews, the 5-minute hallway design discussions — these still happen in Japanese at most Japanese tech companies, even ones with "English-OK" policies. Engineers who hit N3 unlock real participation. Engineers who stay below N3 quietly stay outside the loop.
+
+For the data-heavy career view, [Japan Dev's essential Japanese for engineers](https://japan-dev.com/blog/essential-japanese-for-software-engineers) and [Coto Academy's 200 engineer vocab list](https://cotoacademy.com/200-japanese-vocabulary-for-it-and-software-engineers/) cover the vocabulary side. This guide focuses on the **phrases, registers, and rituals** they leave out.
+
+---
+
+## The framework: register × ritual × read-vs-write
+
+Tech-Japanese guides usually give you vocabulary in flat lists. That's the wrong shape. **Useful Japanese at work is a three-axis cube**:
+
+- **Register (politeness):** *keigo* (敬語) / polite / casual — covered in our [keigo guide](/en/guides/keigo-guide/).
+- **Ritual (engineering ceremony):** standup, PR review, sprint planning, demo, retro, client call.
+- **Read-vs-write:** what you consume (Slack threads, Notion docs, Jira tickets) vs. what you produce (PR comments, standup updates).
+
+Pick a cell, look up the phrase. Memorize across one axis and you'll still get stuck the moment another axis shifts.
+
+### A/B/C politeness legend
+
+We use the same three-tier model as every other article on this site, so the framework transfers across the cluster.
+
+| Tier | Name | When to use | Sample sentence ending |
+|---|---|---|---|
+| **A** | *Keigo* — full *sonkeigo* / *kenjougo* | Clients, executives, external partners, first contact | *o-okuri itashimasu* (お送りいたします) |
+| **B** | Polite — *desu* / *masu* form | Default office speech, most internal communication | *o-okuri shimasu* (お送りします) |
+| **C** | Casual — plain form | Same-level peers, informal Slack, late-night debugging | *okuru ne* (送るね) |
+
+For the full sonkeigo / kenjougo split, see [the keigo guide's A/B/C breakdown](/en/guides/keigo-guide/).
+
+### The six engineering rituals
+
+Every team I've worked with in Japan runs some version of these six rituals. The register expected in each is **not the same**, even within the same team on the same day:
+
+| Ritual | Default register | Who outranks you (usually) |
+|---|---|---|
+| Daily standup | B (polite) | Tech lead, EM |
+| PR review and code comments | B → A toward senior reviewers | Reviewer often senior |
+| Sprint planning / refinement | B | PM, tech lead |
+| Demo / sprint review | A toward stakeholders, B internally | Mixed audience |
+| Retrospective | B → C with familiar team | Peers |
+| Client / stakeholder meetings | A | Always |
+
+### Reading Japanese vs. writing Japanese — split your study
+
+Engineers spend most of their Japanese time **reading** — Slack threads scrolling past, Notion docs, Jira tickets, error messages, post-incident write-ups. Active output is a thin slice: maybe a few PR comments, a 30-second standup update, one Slack DM to a teammate.
+
+This means **passive vocab can be 2–3× your active vocab** and you'll still function. Learn to recognize *shian* (試案, draft proposal), *teppai* (撤回, retraction), *ikkatsu shori* (一括処理, batch processing) when you see them, even if you never need to write them. The read-vs-write table below makes the split explicit.
+
+---
+
+## Week-1 survival deck — 20 phrases
+
+If you only learn 20 phrases before your first day, learn these. Each is tagged with its register tier (A/B/C) and the ritual where you'll use it.
+
+| # | Phrase | Meaning | Tier | Ritual |
+|---|---|---|---|---|
+| 1 | *ohayō gozaimasu* (おはようございます) | Good morning (works any time of day on first encounter) | B | All |
+| 2 | *otsukare-sama desu* (お疲れさまです) | Hi / thanks / bye — the all-purpose office greeting | B | All |
+| 3 | *yoroshiku onegai-shimasu* (よろしくお願いします) | Please / I'm counting on you / thanks in advance | B | All |
+| 4 | *shōchi shimashita* (承知しました) | Understood (safe upward) | B | All |
+| 5 | *kakunin itashimasu* (確認いたします) | I'll check / confirm | A | PR / Slack |
+| 6 | *kyō no shinchoku desu* (今日の進捗です) | Here's today's progress | B | Standup |
+| 7 | *burokkā wa nai-desu* (ブロッカーはないです) | No blockers | B | Standup |
+| 8 | *X de tsumatte-imasu* (Xで詰まっています) | I'm stuck on X | B | Standup |
+| 9 | *rebyū o onegai-dekimasu ka?* (レビューをお願いできますか？) | Could you review this? | B | PR |
+| 10 | *PR no shūsei kanryō shimashita* (PRの修正完了しました) | I've finished the PR changes | B | PR |
+| 11 | *LGTM-desu* (LGTMです) | Looks good to me | C | PR |
+| 12 | *koko shōshō ki ni narimasu* (ここ少々気になります) | I have a small concern here | B | PR |
+| 13 | *suko-shi jikan kudasai* (少し時間ください) | Need a bit more time | C | Standup / Slack |
+| 14 | *ato de kotaesasete kudasai* (あとで答えさせてください) | Let me get back to you on that | B | Meetings |
+| 15 | *X-san ni sōdan shitemimasu* (Xさんに相談してみます) | I'll check with X | B | All |
+| 16 | *demo no junbi dekite-imasu* (デモの準備できています) | Demo is ready | B | Demo |
+| 17 | *shitsumon arimasu* (質問あります) | I have a question | B | All |
+| 18 | *mō ichi-do o-negai-shimasu* (もう一度お願いします) | Could you say that again? | B | Meetings |
+| 19 | *gomeiwaku okake-shimasu* (ご迷惑おかけします) | Sorry to trouble you (incident / blocker context) | A | Incidents |
+| 20 | *o-saki-ni shitsurei-shimasu* (お先に失礼します) | Logging off — see you tomorrow | B | EOD |
+
+Print this and tape it to your monitor for week one. You'll recognize half of them by Friday.
+
+---
+
+## Phrases by engineering ritual
+
+The full A/B/C × ritual matrix. Each ritual gets the three register tiers, plus a common-mistake callout. Copy what fits your situation; don't try to memorize all of them at once.
+
+### Daily standup
+
+Most teams run a 5–10 minute standup with three classic questions: yesterday's progress, today's plan, blockers. Standup register is **B by default**, drops to **C** with close peers, climbs to **A** if the EM is presenting to a senior stakeholder.
+
+| Purpose | A (*keigo*) | B (polite default) | C (casual) |
+|---|---|---|---|
+| Report yesterday's progress | *Sakujitsu wa X o-kanryō itashimashita* (昨日はXを完了いたしました) | *Kinō wa X owarimashita* (昨日はXが終わりました) | *Kinō X owatta* (昨日X終わった) |
+| Report today's plan | *Honjitsu wa X ni torikumi-masu* (本日はXに取り組みます) | *Kyō wa X o yarimasu* (今日はXをやります) | *Kyō X yaru* (今日Xやる) |
+| Flag no blockers | *Burokkā wa gozaimasen* (ブロッカーはございません) | *Burokkā wa nai-desu* (ブロッカーはないです) | *Burokkā nashi* (ブロッカーなし) |
+| Flag a blocker | *X no ken de gosōdan sasete-kudasai* (Xの件でご相談させてください) | *X de tsumatte-imasu* (Xで詰まっています) | *X de hamatteru* (Xでハマってる) |
+
+> **Common mistake:** Saying "*nothing*" or silently nodding when you have a blocker. In Japanese teams, "*tokuni nai-desu*" (特にないです) without explanation reads as you've stopped engaging. If you're stuck, **name it explicitly** — *X de tsumatte-imasu, ato de sōdan sasete-kudasai* (Xで詰まっています、あとで相談させてください). That's one sentence, and it changes how the team perceives your day.
+
+### PR review and code comments
+
+PR threads in Japanese are where most foreign engineers get caught off-guard — written register matters more than spoken because the comment lives forever. Default to **B** with peers, **A toward senior reviewers** or anyone outside your team.
+
+| Purpose | A | B | C |
+|---|---|---|---|
+| Request a review | *Rebyū o onegai-itashimasu* (レビューをお願いいたします) | *Rebyū onegai-shimasu* (レビューお願いします) | *Mite kudasai* (見てください) |
+| Approve (LGTM) | *Kakunin itashimashita, mondai gozaimasen* (確認いたしました、問題ございません) | *Kakunin shimashita, daijōbu desu* (確認しました、大丈夫です) | *LGTM* / *OK desu* |
+| Suggest a change | *Koko, X no kanōsei mo go-ken-tō itadaketara-to omoimasu* (こちら、Xの可能性もご検討いただけたらと思います) | *Koko, X mo arikamo desu* (ここ、Xもありかもです) | *Koko, X no hō ga ī-kamo* (ここ、Xのほうがいいかも) |
+| Block (request change) | *Mōshiwake gozaimasen ga, X no shūsei o onegai-dekimasu deshō ka* (申し訳ございませんが、Xの修正をお願いできますでしょうか) | *Sumimasen, X o naoshite morattemo ī desuka* (すみません、Xを直してもらってもいいですか) | *X naoshite-* (Xなおして〜) |
+| Reply to a reviewer | *Shōchi itashimashita, shūsei sasete-itadakimasu* (承知いたしました、修正させていただきます) | *Shōchi-desu, naoshimasu* (承知です、直します) | *Wakatta, naosu* (わかった、直す) |
+
+> **Common mistake:** Writing *ryōkai-desu* (了解です) on a PR comment when the reviewer is your tech lead or external. *Ryōkai* reads as casual-upward. With anyone above you or outside your team, swap it for *shōchi shimashita* — same length, much safer landing. See [the keigo mistakes guide](/en/guides/keigo-mistakes/) for the full breakdown.
+
+### Sprint planning and refinement
+
+Planning is where you negotiate scope and estimates. Register stays at **B**, but the **rhetorical patterns** matter more than vocab — pushing back politely is a learned skill in Japanese.
+
+| Purpose | A | B | C |
+|---|---|---|---|
+| Question an estimate | *Kono kōsū kanjō ni-tsuite, mō shōshō kakunin sasete-kudasai* (この工数感について、もう少々確認させてください) | *Kono mitsumori, motto kakaru kamo desu* (この見積もり、もっとかかるかもです) | *Kore, motto kakaru-yo* (これ、もっとかかるよ) |
+| Defer to next sprint | *Kondo no suprinto wa kibishī desuga, jiki wa taiō kanō desu* (今回のスプリントは厳しいですが、次期は対応可能です) | *Konkai wa muri desu, jiki dewa OK desu* (今回は無理です、次回ではOKです) | *Konkai muri, tsugi de* (今回むり、次で) |
+| Ask for clarification | *Yōken o motto kuwashiku oshiete-itadaketara to-omoimasu* (要件をもっと詳しく教えていただけたらと思います) | *Yōken o motto kuwashiku oshiete kudasai* (要件をもっと詳しく教えてください) | *Yōken, motto kuwashiku* (要件、もっとくわしく) |
+| Volunteer to take a ticket | *X no chiketto, watashi ga tantō sasete-itadakimasu* (Xのチケット、私が担当させていただきます) | *X no chiketto, watashi ga yarimasu* (Xのチケット、私がやります) | *X yaru-yo* (Xやるよ) |
+
+> **Common mistake:** Saying *daijōbu desu* (大丈夫です) when you mean "I'm not sure but I'll figure it out." Native teammates take *daijōbu* literally. If you have doubts, **say them**: *daijōbu da-to omoimasu ga, kakunin shitara mata renraku-shimasu* (大丈夫だと思いますが、確認したらまた連絡します).
+
+### Demo / sprint review
+
+Demos are a mixed-audience ritual — engineers, PM, sometimes stakeholders. Default to **B**, climb to **A** when speaking *to* the stakeholder, drop to **B–C** for engineer-to-engineer asides.
+
+| Purpose | A | B | C |
+|---|---|---|---|
+| Open the demo | *Honjitsu no demo o hajime-sasete-itadakimasu* (本日のデモを始めさせていただきます) | *Demo o hajimemasu* (デモを始めます) | *Demo iku-yo* (デモいくよ) |
+| Highlight a feature | *Kochira ga X no kinō ni narimasu — go-kakunin itadaketara saiwai desu* (こちらがXの機能になります — ご確認いただけたら幸いです) | *Kochira ga X no kinō desu* (こちらがXの機能です) | *Kore ga X* (これがX) |
+| Acknowledge a known issue | *Genjiten dewa X no kadai ga arimasu — jiki suprinto de taiō yotei desu* (現時点ではXの課題があります — 次期スプリントで対応予定です) | *Ima X no mondai aru-n-desu, raisu de naoshimasu* (今Xの問題あるんです、来スプで直します) | *X mada, tsugi de naosu* (Xまだ、次で直す) |
+| Field a question | *Sayō de gozaimasu / sono kanōsei mo gozaimasu* (左様でございます／その可能性もございます) | *Sō desu / sono kanōsei mo arimasu* (そうです／その可能性もあります) | *Hai / kamo* (はい／かも) |
+
+> **Common mistake:** Using *baito keigo* (バイト敬語) like *X ni narimasu* (Xになります) for "this is X" — common in service-industry training but flagged as amateur in tech meetings. Say *X desu* or *X de gozaimasu* instead. See [keigo mistakes](/en/guides/keigo-mistakes/) for the full Mistake 5 breakdown.
+
+### Retrospective
+
+Retros are where teams talk about what went well, what didn't, and what to change. Register drops to **B–C** because the room is psychologically safer. **But** if the EM or a manager from another team is observing, climb back to B.
+
+| Purpose | A | B | C |
+|---|---|---|---|
+| Raise a "didn't go well" | *Kondo no suprinto de wa X ga umaku ikana-katta to kanjite-orimasu* (今回のスプリントではXがうまくいかなかったと感じております) | *Konkai, X ga umaku ikana-katta desu* (今回、Xがうまくいかなかったです) | *Konkai, X mazu-katta* (今回、Xまずかった) |
+| Propose an improvement | *Tsugikai wa X o shimi-sasete-itadaketara to omoimasu* (次回はXを試させていただけたらと思います) | *Tsugi wa X o yatte-mimashō* (次はXをやってみましょう) | *Tsugi X de yatte miyō* (次Xでやってみよう) |
+| Thank a teammate | *X-san no go-shien, makoto-ni arigatō gozaimashita* (Xさんのご支援、誠にありがとうございました) | *X-san, tasukari-mashita, arigatō gozaimasu* (Xさん、助かりました、ありがとうございます) | *X-san, sankyū* (Xさん、サンキュー) |
+| Disagree politely | *Sukoshi chigatta kenkai ga arimashite, kyōyū sasete-kudasai* (少し違った見解がありまして、共有させてください) | *Chotto chigau iken arimasu, ī desu ka* (ちょっと違う意見あります、いいですか) | *Iya, oreteki ni wa-* (いや、俺的には〜) |
+
+> **Common mistake:** Skipping the "what went well" half because it feels performative. In Japanese team culture, naming positives is part of psychological safety scaffolding — skipping it makes the negatives land harder than intended.
+
+### Client / stakeholder meetings
+
+Default register is **A**. There is no C in this room. Even the small-talk warm-up uses *desu* / *masu* at minimum.
+
+| Purpose | A | B (only with same-side internal whisper) |
+|---|---|---|
+| Greet | *Honjitsu wa o-isogashī tokoro, makoto-ni arigatō gozaimasu* (本日はお忙しいところ、誠にありがとうございます) | *Yoroshiku onegai-shimasu* |
+| Introduce yourself | *Hajimemashite, [name] to mōshimasu — yoroshiku o-negai itashimasu* (はじめまして、[name]と申します — よろしくお願いいたします) | *[name] desu, yoroshiku onegai-shimasu* |
+| Propose | *X o go-teian sasete-itadakitaku zonjimasu* (Xをご提案させていただきたく存じます) | *X o teian-shimasu* |
+| Confirm | *Sayō de gozaimasu* (左様でございます) | *Sō desu* (そうです) |
+| Close | *Honjitsu wa makoto-ni arigatō gozaimashita — hikitsudzuki nani-tozo yoroshiku o-negai itashimasu* (本日は誠にありがとうございました — 引き続き何卒よろしくお願いいたします) | *Arigatō gozaimashita* |
+
+> **Common mistake:** Translating "Looking forward to working with you" too literally as *issho-ni hatarakeru-no o tanoshimi-ni shite-imasu*, which sounds breezy in Japanese. The standard close is *hikitsudzuki yoroshiku o-negai itashimasu* — keep it formal. See [japanese-self-introduction-business](/en/guides/japanese-self-introduction-business/) for first-meeting register depth.
+
+### Slack / async chat (bonus)
+
+Slack feels casual — and is, with peers. **But the recipient determines register, not the channel.** Same Slack channel, different DM, different register.
+
+| Recipient | Default register | Sample opener |
+|---|---|---|
+| Same-level peer | C | *X-san, chotto-ī?* (Xさん、ちょっといい？) |
+| Manager / EM | B | *X-san, ima ī desu ka?* (Xさん、いま良いですか？) |
+| Cross-team senior | A | *X-san, o-tsukare-sama de gozaimasu — go-shitsumon shitai ken ga arimashite* (Xさん、お疲れさまでございます — ご質問したい件がありまして) |
+| Client / external | A | *X-sama, o-sewa ni natte orimasu — go-renraku itashimashita* (X様、お世話になっております — ご連絡いたしました) |
+
+> **Common mistake:** Heavy emoji use upward. Engineers default to peer-comfortable Slack norms and emoji-flood a DM to the EM. Half of them is fine; ten is not. Match what the recipient sends you, not the channel norm.
+
+---
+
+## Read-vs-write vocabulary — the 100-word split
+
+The biggest unfair advantage you can give yourself is **deciding which 60 % of vocabulary is for reading only**. You see it in Slack, Notion, Jira, error logs — you don't need to write it back. The active 40 % is what you need to produce.
+
+### Receive-only (~60 terms you'll see, not say)
+
+Recognize these. Don't sweat being able to write them.
+
+| Category | Sample terms |
+|---|---|
+| Spec / docs | *yōken* (要件), *shian* (試案), *bessi* (別紙), *teppai* (撤回), *suikō* (遂行) |
+| Project status | *shinchoku* (進捗), *chien* (遅延), *chōseichū* (調整中), *teitai* (停滞), *fukken* (復旧) |
+| Estimates / dates | *kōsū* (工数), *nōki* (納期), *meate* (目処), *zantei* (暫定), *kakutei* (確定) |
+| Quality / ops | *hinshitsu* (品質), *kashō* (瑕疵), *kashō-tsūchi* (瑕疵通知), *fukki* (復帰), *eikyō-han'i* (影響範囲) |
+| Decisions | *ketsugi* (決議), *kettei jikō* (決定事項), *hoyū* (保有), *hori-age* (堀り上げ), *bekken* (別件) |
+| Org / HR | *honbu* (本部), *shōkaku* (昇格), *idō* (異動), *kachō / buchō / honbuchō* (課長／部長／本部長), *yakushoku* (役職) |
+
+### Produce (~40 terms you'll need to write or say)
+
+These you should be able to type without thinking.
+
+| Category | Sample terms |
+|---|---|
+| Verbs you'll use daily | *kakunin* (確認), *taiō* (対応), *shūsei* (修正), *kanryō* (完了), *kaishi* (開始), *ki dōchū* (起動中) |
+| Status updates | *shinchoku desu* (進捗です), *burokkā* (ブロッカー), *omori* (重め), *karui* (軽い), *yokojiku* (横軸) |
+| Asks | *o-negai-shimasu* (お願いします), *kakunin-onegai* (確認お願い), *rebyū-onegai* (レビューお願い), *sōdan* (相談), *teian* (提案) |
+| Tech katakana | *taasuku* (タスク), *komitto* (コミット), *deplyo* (デプロイ), *ma-ji* (マージ), *banbu* (バグ), *risōsu* (リソース) |
+| Soft asks | *chotto* (ちょっと), *shōshō* (少々), *sukoshi* (少し), *moshi yoroshikereba* (もしよろしければ) |
+
+> **Study principle:** Move new vocab from "receive" to "produce" only when you've used it three times in writing. Otherwise it'll sit dead in flashcards.
+
+---
+
+## JLPT level → which engineering tasks you can take on
+
+Vocab guides usually tell you *which* JLPT level is "needed." More useful: **what unlocks at each level**.
+
+| JLPT level | What you can realistically do | What's still hard |
+|---|---|---|
+| **N5** | Greetings, basic standup phrases ("*kinō X owatta*"), one-line Slack replies | Following a 5-person sprint planning, writing PR comments unaided |
+| **N4** | Catch ~40 % of standup, ask short clarifying questions, write one-sentence PR replies with templates | Negotiating estimates, reading 1-page Notion specs |
+| **N3** | Write PR comments unaided, hold a 10-minute 1:1 in Japanese, contribute in sprint planning | Facilitating retros, joining client calls solo |
+| **N2** | Facilitate retros, present at internal demos, join most client calls | Negotiating contracts, presenting at company-wide all-hands |
+| **N1** | Lead client engagements, write company-wide announcements, do TL/EM-level facilitation | Rare specialized contexts only (legal review, M&A) |
+
+> **Reality check:** Most engineers plateau at N3 because **N3 → N2 is the largest jump in study hours per outcome**. You can ship at N3 forever. To facilitate retros and confidently join client calls, you need to push into N2 — and most people who do, do it because they decided to, not because the team forced it. For a realistic learning roadmap, see [the best way to learn keigo guide](/en/guides/best-way-to-learn-keigo/).
+
+---
+
+## Top 5 engineer-specific keigo mistakes
+
+These are the keigo errors that hit specifically in engineering rituals. For the general keigo mistake catalog, see [keigo mistakes](/en/guides/keigo-mistakes/).
+
+1. **PR-comment *ryōkai-desu* to senior reviewer.** *Ryōkai* (了解) is casual-upward. To a tech lead or external reviewer, swap for *shōchi shimashita* (承知しました). Highest-ROI fix in your first month.
+2. **Over-literal "blocked by" → *X ni burokku sarete-imasu*.** Native phrasing: *X de tsumatte-imasu* (Xで詰まっています) or *X machi desu* (X待ちです). Engineering-translated English calques are flagged as awkward.
+3. **Slack-paste *sasete-itadakimasu* overuse.** Sending a doc doesn't require permission. *O-okuri shimasu* (お送りします) is enough. *O-okuri sasete-itadakimasu* in chat reads as anxious. See [keigo mistakes mistake 6](/en/guides/keigo-mistakes/#mistake-6-overusing-sasete-itadaku).
+4. **Ambiguous *kakunin onegai-shimasu* without context.** "Please check" with no link, no specifics, no priority. Native engineering chat is more specific: *X no koko, kyō-jū ni kakunin o-negai-dekimasu ka* (Xのここ、今日中に確認お願いできますか) — pointer + deadline + ask.
+5. **Skipping *otsukare-sama desu* on EOD.** Logging off without a sign-off reads as ghosting. *O-saki-ni shitsurei-shimasu* (お先に失礼します) or *otsukare-sama desu, agarimasu* (お疲れさまです、上がります) is the standard close. Costs three seconds. Worth it.
+
+---
+
+## Katakana tech-word pitch-accent watchlist
+
+Every vocab guide tells you "katakana = easy." **What they don't tell you** is that katakana tech words have specific Japanese pitch-accent patterns, and getting them wrong is one of the most-corrected things about foreign engineers' Japanese.
+
+Pitch-accent notation here: ⌐ at the start = *atamadaka* (head-high, drops after first mora). ⌐ in the middle = *nakadaka* (peaks then drops). Flat = *heiban* (no drop within word).
+
+| Term | Pitch pattern | Common foreigner mistake |
+|---|---|---|
+| *taasuku* (タスク) | ⌐___ (atamadaka) | English-flat — sounds like a question |
+| *komitto* (コミット) | ___⌐ (heiban, then drop on particle) | English stress on first syllable |
+| *deriri-su* (デプロイ) | ___⌐ (heiban-ish) | Stress on "ploy" English-style |
+| *ma-ji* (マージ) | ⌐_ (atamadaka) | Drawn-out, English "merge"-like |
+| *banbu* (バグ) | ⌐_ (atamadaka) | English "bug" with rising tone |
+| *sa-bā* (サーバー) | ⌐___ (atamadaka) | English "server" stress on "ser" |
+| *kuraianto* (クライアント) | ___⌐__ (nakadaka) | English-stress on "cli-" |
+| *risōsu* (リソース) | ___⌐_ (nakadaka) | Flat or English-stressed |
+| *ririisu* (リリース) | ___⌐_ (nakadaka) | Long-vowel mishandled |
+| *purodakuto* (プロダクト) | ___⌐__ (nakadaka) | English "PRO-duct" stress |
+| *suprinto* (スプリント) | ___⌐__ (nakadaka) | English "SPRINT" punched |
+| *retorosupekutibu* (レトロスペクティブ) | ___⌐_____ (heiban-nakadaka mix) | Anywhere on this word, honestly |
+
+> **How to practice:** When a colleague says one of these words in standup, repeat it back in your head matching their tone exactly. Two weeks of mirror-listening will outperform six months of flashcards on pitch.
+
+---
+
+## How to keep learning — the engineer's habit stack
+
+You don't need a tutor. You need a habit.
+
+- **Weekly: read one Qiita or Zenn article in your stack** ([qiita.com](https://qiita.com) / [zenn.dev](https://zenn.dev)). Pick something close to your daily work. The vocabulary is auto-prioritized by relevance.
+- **Daily: 5-minute Slack observation log.** Each day, copy one phrase your team used that you wouldn't have produced. Tag with register and ritual. After 90 days you'll have ~80 phrases that match your specific team's voice — better than any generic vocab list.
+- **Monthly: write one PR description in Japanese.** One per month. Even if you delete the section before merge. Forces you to produce, not only consume.
+- **Quarterly: practice retro facilitation.** Even with your dog. Out-loud Japanese is the rarest practice mode for engineers.
+
+For a structured month-by-month learning plan, see [best way to learn keigo](/en/guides/best-way-to-learn-keigo/).
+
+---
+
+## FAQ
+
+### Do I need Japanese to work as a software engineer in Japan?
+
+No, but you'll plateau quickly without it. Code review, standups, sprint planning, and informal hallway design discussions happen in Japanese at most Japanese tech companies, even ones with English-OK policies. N3 unlocks active participation. Below N3 you're outside the loop on context that doesn't make it into written specs.
+
+### What JLPT level is needed for IT jobs in Japan?
+
+The market splits at N3. Below N3, you're applying to a narrower pool of international-friendly roles (Mercari, PayPay, Rakuten English-track, many startups). N3 doubles your options. N2 opens almost everything except client-facing consulting work. N1 is rarely required even for senior IC engineers.
+
+### Is katakana enough for tech work?
+
+For token vocabulary, mostly yes. For the **sentence around the noun** — how to ask, suggest, push back, escalate, defer — no. Katakana tech words live inside Japanese grammar, and the grammar is where register, politeness, and team-culture nuance happens. That's why this guide focuses on phrases, not tokens.
+
+### How do you say "deploy" or "merge" in Japanese?
+
+*Deplyo* (デプロイ) and *ma-ji* (マージ). The tokens are easy. The interesting choices are around them: *deplyo shimasu* (polite default), *deplyo shitokimasu* (casual same-side), *deplyo sasete-itadakimasu* (over-polite to client). Picking the right register is the actual skill.
+
+### What's the most common Japanese mistake foreign engineers make?
+
+Using *ryōkai-desu* (了解です) upward in PR comments and Slack DMs. *Ryōkai* carries a faint top-down tone. Safe peer-to-peer; reads as casual when sent to a tech lead or external reviewer. Swap for *shōchi shimashita* / *shōchi itashimashita* and you've made the single highest-ROI keigo fix available to a foreign engineer.
+
+---
+
+## Related articles
+
+- [Keigo guide](/en/guides/keigo-guide/) — the full A/B/C politeness framework this article reuses.
+- [Keigo mistakes](/en/guides/keigo-mistakes/) — the 8-mistake severity-tier catalog. Engineer pitfalls in this article are a subset.
+- [Keigo cheat sheet](/en/guides/keigo-cheat-sheet/) — printable verb-pair lookup tables for *sonkeigo* / *kenjougo*.
+- [Japanese business phrases PDF](/en/guides/japanese-business-phrases-pdf/) — 30 scenario phrases × 3 registers, broader than tech.
+- [Japanese self-introduction for business](/en/guides/japanese-self-introduction-business/) — first-meeting register, useful for client calls.
+- [Best way to learn keigo](/en/guides/best-way-to-learn-keigo/) — 90-day structured learning plan.
+
+---
+
+## Get the Essential 30 phrase deck
+
+Want the **30 most-used office Japanese phrases** organized by register and scenario in printable PDF form? [Grab the Essential 30 PDF](https://rwjapanese.gumroad.com/l/essential-30) — pasted-into-Slack ready, organized by uchi-soto axis, free.
+
+Built for the same engineer who can read this guide and still wants a sheet next to their monitor on day one.
