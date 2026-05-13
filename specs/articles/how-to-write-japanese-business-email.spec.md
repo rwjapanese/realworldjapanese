@@ -27,16 +27,16 @@ lead_magnet: null
 # === LANGUAGES ===
 languages:
   en:
-    status: "drafting"
+    status: "published"
     url_slug: "how-to-write-japanese-business-email"
     diff_spec: null
   ja:
-    status: "drafting"
+    status: "published"
     url_slug: "how-to-write-japanese-business-email"
     diff_spec: null
 
 # === LIFECYCLE ===
-status: "drafting"
+status: "published"
 created: "2026-05-12"
 last_serp_audit: "2026-05-12"
 ---
@@ -400,6 +400,7 @@ last_serp_audit: "2026-05-12"
 
 | Date | Change | Author |
 |---|---|---|
+| 2026-05-13 | **Publish flip → both languages `published`**. ユーザー指示で spec `status: drafting → published`、`languages.{en,ja}.status: drafting → published`。本番は既に live（mdx `draft: false` で 2026-05-13 git push 完了、Cloudflare 反映済）— この flip は spec メタトラッキングを実態に追随させる修正。ROADMAP Live articles 表も ✅ published に flip。| ryoooue (publish trigger) + Claude Opus 4.7 |
 | 2026-05-13 | **EN v1 shipped (drafting status)**. Body at `src/data/guides/en/how-to-write-japanese-business-email.mdx` (3,862 words). Implements §7 EN outline 1:1 with the JA v1 confirmed in the same session — 8-step ladder (subject → TO/CC/BCC → addressee → opening → self-intro → body → closing → signature) with A/B/C register tables per step, *uchi-soto* (内外) framing, 15–25-char break rule with before/after code block, 10-item pre-send checklist, 30-second recovery section + name-mistake apology email block, FAQ 5 entries (PAA-aligned), 7 sibling cross-links + Essential 30 CTA. Title: "How to Write a Japanese Business Email: 8 Steps from Subject to Signature" (74 chars, exact-match target keyword in first 38 chars). `seo-article-localize` skipped — base spec is en-SERP-rooted, same call as `business-email-template` and `japanese-business-phrases-pdf`. `en-article-style` rules A1–D7 followed: em-dash spacing, Oxford comma, sentence-case H2/H3, italic *romaji* + (kanji) on first use with Hepburn macrons (ō/ū), 40–60-word featured-snippet paragraph after intro, 4 persona bullets, paragraph cap ≤ 4 sentences, bold key phrase per paragraph, FAQ H2 with 5 H3s, descriptive anchors throughout. Linter: 0 auto-fixes needed (em-dashes already correctly spaced), 2 weak-qualifier flags manually corrected (`A doesn't really live in email` → `A has almost no role in email`; `Just "Yamada here"` → `"Yamada here" works alone`). `pnpm build` green at 84 pages, 0 errors. Both `languages.en.status` and `languages.ja.status` now `drafting`. **Next:** human review of EN v1 → EN v2 if needed → publish flip on both languages. | Claude Opus 4.7 + ryoooue |
 | 2026-05-13 | **JA v1 review pass 1**. Author feedback 2 件適用：(1) タイトルから「一から」を削除 →「日本語ビジネスメールの書き方｜件名から署名まで8ステップで組み立てる」(33 字)。「組み立てる」だけでプロセス志向は伝わるため冗長修飾を整理。(2) 冒頭 hook を「日本企業に入って1週間」起点 → 「日本語でビジネスメールを書こうとして、件名欄で手が止まったことはありませんか」型の house-style 疑問形に変更し、1年目／転職3年目／海外勤務開始の3層を明示してターゲット範囲を拡大。`pnpm build` re-run green。spec §7 H1 案も同時更新。| Claude Opus 4.7 + ryoooue |
 | 2026-05-13 | **JA v1 shipped (drafting status)**. Body at `src/data/guides/ja/how-to-write-japanese-business-email.mdx` (12,847 chars including frontmatter and FAQ block). Implements §7 JA outline in full: 8-step ladder (件名 → 宛先選択 → 宛名 → 冒頭挨拶 → 名乗り → 本文 → 結び → 署名) with A/B/C register table embedded at each step, TO/CC/BCC selection chapter (Step 0 + Step 2), 1-line 15–25-char break rule with before/after code-block example, 10-item pre-send checklist, mistake-recovery section including a full apology email block, 7 sibling-article cross-links, FAQ 5 entries (PAA-aligned). All 6 zero-coverage SERP gaps from §4 implemented. `ja-article-style` linter: 8 `**...**`→`<strong>` conversions + 1 `TO / CC / BCC`→`TO/CC/BCC` collapse on first pass, idempotent on second pass. Manual fixes: `NGです`→「不適切」 and `OK（短縮版）`→「可（短縮版）」 per Rule 3. `pnpm build` green at 70 pages. **Next:** human review of `src/data/guides/ja/how-to-write-japanese-business-email.mdx` → JA v2 if changes → `seo-article-localize` judgment → EN v1. EN must not start before JA v1 human review per feedback_article_writing_workflow.md. | Claude Opus 4.7 + ryoooue |

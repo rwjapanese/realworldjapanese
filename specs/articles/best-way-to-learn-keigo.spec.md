@@ -20,16 +20,16 @@ lead_magnet: null
 # === LANGUAGES ===
 languages:
   en:
-    status: "drafting"
+    status: "published"
     url_slug: null
     diff_spec: null
   ja:
-    status: "drafting"
+    status: "published"
     url_slug: null
     diff_spec: null
 
 # === LIFECYCLE ===
-status: "drafting"
+status: "published"
 created: "2026-05-12"
 last_serp_audit: "2026-05-12"
 ---
@@ -332,3 +332,4 @@ last_serp_audit: "2026-05-12"
 | 2026-05-13 | JA v1 shipped at `src/data/guides/ja/best-way-to-learn-keigo.mdx` (450 lines、約14,300字含ローマ字)、`ja-article-style` linter idempotent pass、`pnpm build` green (20 indexed pages)、サイトマップ登録済。Spec §7 outline 全項目を実装：4 ペルソナ → 5 問セルフ診断（Yes 数で章ルーティング）→ A/B/C フレーム復習＋「読む7割×話す3割」ルール＋「3 種類同時学習はなぜ遠回りか」3 理由 → 90 日ロードマップ全体表（5 列：到達目標 / 教材 / 1 日タスク / 週末ドリル / 自己テスト）→ ステージ 1（7 日スターターメニュー + Day 30 10 問テスト）→ ステージ 2（8 核動詞ペア表 + SRS カードレイアウト + メール/電話/会議 各5本 + Day 60 即答テスト）→ ステージ 3（シャドーイング 5 ステップ表 + ロープレ台本 3 本（面接/報告/謝罪）+ Day 90 未見シーンテスト）→ 学習法マトリクス（6 手法 × 7 列：1 日コスト / 週コスト / 主な役割 / 適したステージ / 教材 / 弱点）+ 各手法の使い方メモ → つまずきカルテ 3 症状（敬語パラリシス / 「させていただく」過剰 / 尊敬語と謙譲語の混同）→ 期間感のリアル表（5 段階の累計時間目安：40-60h / +20h / +40h / 累計120-150h / 累計250-400h）→ FAQ 5 件 → 関連リンク 6 sibling + Essential 30 CTA。**用語修正**：linter 自動修正後、過去の `keigo-examples` JA v2 で確定した house-style「レジスタ→レベル」を適用（C レジスタ → C レベル、B レジスタ → B レベル、replace_all で 11 箇所修正）。「Yes/No」は構造的なクイズ形式として維持。`languages.ja.status: planned → drafting` に更新。**次：人間レビュー → JA v2 修正があればバックポート → `seo-article-localize` 判定 → EN v1**。EN は JA v2 確定まで着手しない。| Claude Opus 4.7 + ryoooue |
 | 2026-05-13 | JA v2 適用（人間レビュー反映、4点修正）：(1) **タイトル変更** — 「敬語を最短で身につける学習法｜A→B→Cの90日プラン」→「敬語を最短で身につける学習法｜段階別90日ロードマップ」（A→B→C は初見ユーザーに伝わらず CTR を毀損するため、誰でもクリック前に意味が分かる "段階別" + "90日ロードマップ" に置換）。(2) **冒頭リード softening** — 「丁寧語の自動化からスタートして90日で職場運用ラインに到達するステージ別ロードマップを、A→B→Cの3段階で示します」→「丁寧語の習得を最初の足場として、90日で職場運用ラインに近づくための段階別ロードマップを1つの選択肢として示します」（決めつけ口調を回避し、選択肢として提示）。(3) **読み方の提案 softening** — 「その章だけ拾い読みする使い方を推奨します」→「必要な章だけ拾い読みする読み方もできます」（推奨ではなく許可ニュアンスに）。(4) **テーブル内表記の平易化** — A/B/C 表の B 行「ステージ1（Day 1〜30）で完全自動化」→「ステージ1（Day 1〜30）で固める」（「完全自動化」が機械的で伝わりづらいため）。`ja-article-style` linter idempotent pass（修正後再実行で no changes）。タイトル文字数：28 字（前回 34 字）。CTR 寄与の "最短" + "90日" + "ロードマップ" の主要 hook は維持。| Claude Opus 4.7 + ryoooue |
 | 2026-05-13 | EN v1 shipped at `src/data/guides/en/best-way-to-learn-keigo.mdx` (454 lines、4,928 words)、`en-article-style` linter idempotent pass after 5 weak-qualifier corrections（*actually*×4 + *just*×1：FAQ frontmatter "actually use in client emails" → "use in client emails"／quoted persona "I just don't know... how long it'll actually take" → "I don't know... how long it'll take"／"what you actually want" → "what you want"／"It's actually reserved for" → "It's reserved for"／"the pace you can actually sustain" → "the pace you can sustain"）、`pnpm build` green at 24 indexed pages (8,241 words indexed)、サイトマップ登録予定。**`seo-article-localize` 判定: スキップ** — base spec が en-SERP-rooted (`serp_language: en`) のため EN diff spec 不要（`business-email-template` / `japanese-business-phrases-pdf` と同じ判断）。タイトル "Best Way to Learn Keigo: A 90-Day, 3-Stage Roadmap" (52 chars、KW 完全一致 + benefit promise)。en-article-style ルール A1–D7 全準拠：em-dash + spaces / en-dash for ranges (N3–N2, Day 1–30) / Oxford comma / sentence-case H2/H3 / italic *romaji* + (kanji) on first use / Hepburn macrons (ō / ū / mōshi-agemasu) / 40–60-word featured-snippet 段落（intro 直後の "The fastest way to learn keigo is to lock in *teineigo* first..."）/ persona hooks 4 bullets / contractions 多用 / FAQ 5 H3 / descriptive anchors。JA v2 で確定済みの softening を EN にもバックポート：タイトル "Stage-by-Stage" / "3-Stage" を採用、A→B→C のジャーゴンは title から削除（intro と framework section 以降で本格紹介）。Spec の `languages.en.status: planned → drafting` に更新。**次：人間レビュー** → 必要なら EN v2 → publish flip。EN は JA との対物語性を保つため、JA v2 の softening 方針（決めつけ口調回避、選択肢として提示）を EN プロセスでも踏襲（"as one path that works" / "Start with the pace you can sustain" など）。| Claude Opus 4.7 + ryoooue |
+| 2026-05-13 | **Publish flip → both languages `published`**. ユーザー指示で spec `status: drafting → published`、`languages.{en,ja}.status: drafting → published`。本番は既に live（mdx `draft: false` で 2026-05-13 git push 完了、Cloudflare 反映済）— この flip は spec メタトラッキングを実態に追随させる修正。ROADMAP Live articles 表も ✅ published に flip。| ryoooue (publish trigger) + Claude Opus 4.7 |
