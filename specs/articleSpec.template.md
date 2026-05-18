@@ -230,10 +230,21 @@ last_serp_audit: "YYYY-MM-DD"             # Last time we re-ran SERP analysis
 
 > Heads-up for language-diff specs. Flag items that are likely to behave differently in non-English SERPs.
 
+### JA
+
+- **用語:** _英語版でローマ字保持する語の挙動 / 直訳が崩れる語 (例: "keigo" は EN でローマ字、VI/KO では別表記の可能性)。_
+- **文化的前提:** _EN 版が読者背景について暗黙に置いている前提。_
+- **競合ランドスケープ:** _VI / KO など他言語 SERP で top-10 競合セットが全く別物になる可能性。_
+- **言語固有のリスク:** _翻訳で意味が落ちる表現、書き直しが必要なフレーズ。_
+- **ペルソナ pivot の必要性:** _EN 版と JA 版でターゲット読者が乖離するケース (例: EN は外国人学習者、JA SERP は日本人ビジネスパーソン → audience pivot 要否)。_
+
+### EN
+
 - **Terminology:** _Key terms that may not translate directly (e.g. "keigo" stays romanized in EN, but may vary in VI/KO)._
 - **Cultural assumptions:** _Assumptions the EN version makes about the reader's background._
 - **Competitor landscape:** _Is the top-10 competitor set likely to be totally different in, say, VI or KO?_
 - **Language-specific risks:** _Expressions that don't survive translation and need re-writing._
+- **Persona pivot signal:** _Cases where the EN and JA readers diverge (e.g. EN = foreign learners, JA SERP = Japanese business adults → audience pivot decision needed)._
 
 ---
 
