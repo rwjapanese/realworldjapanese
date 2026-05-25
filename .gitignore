@@ -17,6 +17,12 @@ pnpm-debug.log*
 .env
 .env.production
 
+# SEO reporting (scripts/seo_report.py) — never commit creds or the venv
+scripts/.venv/
+scripts/*.json
+*-service-account*.json
+gsc-ga4-key*.json
+
 # macOS-specific files
 .DS_Store
 

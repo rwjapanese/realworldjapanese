@@ -1,4 +1,5 @@
 export const CLUSTERS = [
+  { id: "foundations", label: "Foundations" },
   { id: "keigo", label: "Keigo" },
   { id: "business-email", label: "Business Email" },
   { id: "meetings", label: "Meetings & Phone" },
