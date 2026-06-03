@@ -1,6 +1,9 @@
 # build output
 dist/
 
+# build serialization lock (scripts/build-lock.sh) — runtime-only, never commit
+.astro-build.lock/
+
 # generated types
 .astro/
 
@@ -20,6 +23,8 @@ pnpm-debug.log*
 # SEO reporting (scripts/seo_report.py) — never commit creds or the venv
 scripts/.venv/
 scripts/*.json
+scripts/oauth_client.json
+scripts/oauth_token.json
 *-service-account*.json
 gsc-ga4-key*.json
 
