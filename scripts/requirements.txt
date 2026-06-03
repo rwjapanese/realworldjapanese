@@ -1,4 +1,5 @@
 # SEO reporting (scripts/seo_report.py)
 google-api-python-client>=2.100   # Search Console API
-google-auth>=2.23                 # service-account credentials
+google-auth>=2.23                 # credentials
+google-auth-oauthlib>=1.2         # OAuth login flow (--login)
 google-analytics-data>=0.18       # GA4 Data API
