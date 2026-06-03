@@ -9,7 +9,9 @@ import EditPost from "@/components/EditPost.astro";
 import ShareLinks from "@/components/ShareLinks.astro";
 import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
+import ProductCTA from "@/components/ProductCTA.astro";
 import { getPath } from "@/utils/getPath";
+import { getEntryLang } from "@/utils/i18n";
 import { slugifyStr } from "@/utils/slugify";
 import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
 import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
@@ -36,6 +38,7 @@ const {
   tags,
   hideEditPost,
   faqs,
+  productCTA,
 } = post.data;
 
 const { Content } = await render(post);
@@ -117,6 +120,8 @@ const nextPost =
     >
       <Content />
     </article>
+
+    {productCTA === "essential-30" && <ProductCTA lang={getEntryLang(post.id)} />}
 
     <hr class="my-8 border-dashed" />
 

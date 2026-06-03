@@ -1,0 +1,64 @@
+---
+// Wraps hand-curated related-article markdown lists and renders them as a
+// responsive card grid. Keep the markdown lists in the slot verbatim — this
+// component only restyles them, so per-article copy stays editable in MDX.
+type Props = {
+  title?: string;
+};
+
+const { title = "あわせて読みたい" } = Astro.props;
+---
+
+<nav class="not-prose rwj-related my-10" aria-label={title}>
+  <p class="mb-4 text-base font-semibold text-foreground">{title}</p>
+  <slot />
+</nav>
+
+<style>
+  /* Slotted markdown keeps the page scope, so reach it with :global(). */
+  :global(.rwj-related p strong) {
+    display: block;
+    margin: 1.25rem 0 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--color-accent);
+  }
+  :global(.rwj-related ul) {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.625rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 640px) {
+    :global(.rwj-related ul) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  :global(.rwj-related li) {
+    margin: 0;
+    padding: 0.75rem 0.875rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    line-height: 1.45;
+    font-size: 0.9rem;
+    transition:
+      border-color 0.15s,
+      background-color 0.15s;
+  }
+  :global(.rwj-related li:hover) {
+    border-color: var(--color-accent);
+    background-color: color-mix(in srgb, var(--color-accent) 7%, transparent);
+  }
+  :global(.rwj-related li a) {
+    font-weight: 600;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  :global(.rwj-related li a:hover) {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

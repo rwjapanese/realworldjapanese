@@ -1,0 +1,62 @@
+---
+// Reusable Essential 30 product CTA box.
+// Defaults are language-aware (ja/en); pass props only to override per article.
+type Props = {
+  lang?: string;
+  href?: string;
+  eyebrow?: string;
+  title?: string;
+  blurb?: string;
+  cta?: string;
+  note?: string;
+};
+
+const copy = {
+  ja: {
+    eyebrow: "配布教材",
+    blurb:
+      "本人に渡せる業務日本語の30フレーズを1枚に。受け入れ初期の配布教材としてそのまま使えます。",
+    cta: "Essential 30 を見る",
+    note: "A/B/Cレベル注釈つき・印刷対応・買い切り・更新無料",
+  },
+  en: {
+    eyebrow: "Handout",
+    blurb:
+      "The 30 most useful business-Japanese phrases on a single page — ready to hand to a new hire on day one.",
+    cta: "Get Essential 30",
+    note: "A/B/C level notes · print-ready · one-time purchase · free updates",
+  },
+};
+
+const {
+  lang = "ja",
+  href = "https://rwjapanese.gumroad.com/l/essential-30",
+  title = "Essential 30 PDF",
+} = Astro.props;
+
+const base = lang === "en" ? copy.en : copy.ja;
+const eyebrow = Astro.props.eyebrow ?? base.eyebrow;
+const blurb = Astro.props.blurb ?? base.blurb;
+const cta = Astro.props.cta ?? base.cta;
+const note = Astro.props.note ?? base.note;
+---
+
+<aside
+  class="not-prose my-10 rounded-lg border border-border bg-muted/40 p-6 shadow-sm"
+>
+  <p class="mb-1 text-xs font-semibold tracking-wide text-accent uppercase">
+    {eyebrow}
+  </p>
+  <p class="mb-2 text-lg font-semibold text-foreground">{title}</p>
+  <p class="mb-5 text-sm leading-relaxed text-foreground/80">{blurb}</p>
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener"
+    class="inline-flex items-center gap-2 rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-background no-underline transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+  >
+    {cta}
+    <span aria-hidden="true">→</span>
+  </a>
+  <p class="mt-3 text-xs text-foreground/60">{note}</p>
+</aside>
