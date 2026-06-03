@@ -351,6 +351,7 @@ last_serp_audit: "2026-04-27"
 
 | Date | Change | Author |
 |---|---|---|
+| 2026-06-03 | **email クラスタ pillar 化 / カニバリ対策（EN+JA、本文内リンクのみ）.** 週次 triage で本ページが pos 17.5→21.9（2→3 ページ目）に後退と判明、原因はハネムーン順位剥落 + email クラスタ3記事のカニバリ（"japanese business mail" で how-to-write が本ページを上回る）+ CTR0%。構造調査で **本ページ（pillar）が子の `japanese-email-phrases` へ未リンク**（how-to-write へは有り）= ハブが子を1本取りこぼしと判明。`pillar` frontmatter はコード未消費（メタのみ、keigo クラスタも未使用）のため本文内リンクで対応: ① 冒頭に「日本語ビジネスメールの3ガイド / The Japanese business email cluster」ハブ索引を新設し本ページを "main, start-here guide" と自己宣言、how-to-write（プロセス）+ email-phrases（辞書）へ intent ラベル付きで下向きリンク。② 末尾クラスタリストに欠落していた email-phrases を補完。子→pillar の上向きリンクは EN/JA とも既に充実のため据え置き。astro check 0/0/0。本文その他は無変更。**順位は honeymoon 安定待ち、1〜2 週間後に再観察**。 | Claude Opus 4.8 + ryoooue |
 | 2026-04-27 | Initial spec generated via `seo-article-outline` skill (target_keyword: "Japanese business email template", ★2 priority per SEO.md §4-5). 10/10 competitors fetched. | seo-article-outline |
 | 2026-04-27 | §1 / §4 / §5 に JA セクション追記（bilingual 規約に準拠、§7 はもともと bilingual）。プロジェクト全体テンプレ + skill 既定テンプレ + skill SKILL.md も bilingual 規約に同期。 | ryoooue |
 | 2026-04-27 | **JA本文 v1 draft 完了** (`src/data/guides/ja/business-email-template.mdx`)。spec §7 JA outline に準拠（テンプレートは10→8に圧縮、年末年始あいさつと遅延リカバリーは別H2に統合）。`ja-article-style` 校正 pass（社内 vs 社外 → 社内vs社外、CJK/ASCII スペース除去、一部 `**` → `<strong>` 変換）。`languages.ja.status: drafting`。次は `seo-article-localize` で EN SERP 差分判定 → EN 本文執筆。 | ryoooue |
