@@ -16,6 +16,13 @@ import "@/styles/global.css";
 
 type FAQ = { q: string; a: string };
 
+/**
+ * A single hreflang alternate: the language's html-lang value plus the
+ * absolute URL of that language's version of the current article. Built by the
+ * caller (PostDetails) so slug overrides are honored per language.
+ */
+type Alternate = { hreflang: string; href: string };
+
 type Props = {
   title?: string;
   author?: string;
@@ -28,6 +35,19 @@ type Props = {
   scrollSmooth?: boolean;
   noindex?: boolean;
   faqs?: FAQ[];
+  /**
+   * When provided (article pages), emit hreflang alternates ONLY for these
+   * locales — one per existing counterpart, plus x-default when the default
+   * language version exists. When omitted (index/about/tags/etc.), fall back
+   * to the legacy behavior of listing every active language.
+   */
+  alternates?: Alternate[];
+  /**
+   * Absolute URL used for the x-default alternate. Set only when the default
+   * language (en) version of this article exists. Ignored unless `alternates`
+   * is also provided.
+   */
+  xDefaultHref?: string | null;
 };
 
 const {
@@ -42,6 +62,8 @@ const {
   scrollSmooth = false,
   noindex = false,
   faqs,
+  alternates,
+  xDefaultHref,
 } = Astro.props;
 
 const socialImageURL = new URL(ogImage, Astro.url);
@@ -109,19 +131,35 @@ const faqStructuredData =
 
     <!-- hreflang alternates -->
     {
-      ACTIVE_LANGUAGES.map(l => (
+      alternates &&
+        alternates.map(a => (
+          <link rel="alternate" hreflang={a.hreflang} href={a.href} />
+        ))
+    }
+    {
+      alternates && xDefaultHref && (
+        <link rel="alternate" hreflang="x-default" href={xDefaultHref} />
+      )
+    }
+    {
+      !alternates &&
+        ACTIVE_LANGUAGES.map(l => (
+          <link
+            rel="alternate"
+            hreflang={l.htmlLang}
+            href={buildAlternate(l.code)}
+          />
+        ))
+    }
+    {
+      !alternates && (
         <link
           rel="alternate"
-          hreflang={l.htmlLang}
-          href={buildAlternate(l.code)}
+          hreflang="x-default"
+          href={buildAlternate(DEFAULT_LANGUAGE)}
         />
-      ))
+      )
     }
-    <link
-      rel="alternate"
-      hreflang="x-default"
-      href={buildAlternate(DEFAULT_LANGUAGE)}
-    />
 
     <!-- Load Font -->
     <Font

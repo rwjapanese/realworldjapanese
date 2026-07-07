@@ -10,9 +10,15 @@ import ShareLinks from "@/components/ShareLinks.astro";
 import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
 import ProductCTA from "@/components/ProductCTA.astro";
-import { getPath } from "@/utils/getPath";
-import { getEntryLang } from "@/utils/i18n";
+import { getPath, getUrlBase } from "@/utils/getPath";
+import { getEntryLang, withLang } from "@/utils/i18n";
+import { getCounterpartSlugs } from "@/utils/translationMap";
 import { slugifyStr } from "@/utils/slugify";
+import {
+  ACTIVE_LANGUAGES,
+  DEFAULT_LANGUAGE,
+  type LanguageCode,
+} from "@/config/languages";
 import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
 import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
 import { SITE } from "@/config";
@@ -62,6 +68,30 @@ const ogImage = ogImageUrl
   ? new URL(ogImageUrl, Astro.url.origin).href
   : undefined;
 
+/* ========== hreflang alternates ========== */
+// Emit alternates only for languages that actually have a counterpart of this
+// article, using each language's own (possibly overridden) slug. x-default is
+// emitted only when the default-language version exists.
+const urlBase = getUrlBase(post.filePath);
+const counterpartSlugs = await getCounterpartSlugs(post.collection, post.id);
+
+function alternateHref(lang: LanguageCode, slug: string): string {
+  return new URL(withLang(lang, `${urlBase}/${slug}`), SITE.website).href;
+}
+
+const alternates = ACTIVE_LANGUAGES.filter(
+  l => counterpartSlugs[l.code] !== undefined
+).map(l => ({
+  hreflang: l.htmlLang,
+  href: alternateHref(l.code, counterpartSlugs[l.code] as string),
+}));
+
+const defaultSlug = counterpartSlugs[DEFAULT_LANGUAGE];
+const xDefaultHref =
+  defaultSlug !== undefined
+    ? alternateHref(DEFAULT_LANGUAGE, defaultSlug)
+    : null;
+
 const layoutProps = {
   title: `${title} | ${SITE.title}`,
   author,
@@ -72,6 +102,8 @@ const layoutProps = {
   ogImage,
   scrollSmooth: true,
   faqs,
+  alternates,
+  xDefaultHref,
 };
 
 /* ========== Prev/Next Posts ========== */

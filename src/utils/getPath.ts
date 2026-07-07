@@ -24,6 +24,15 @@ function resolveCollection(filePath: string | undefined): CollectionPaths {
 }
 
 /**
+ * The URL base segment for the collection a file belongs to (e.g. the `blog`
+ * collection is served under `/posts/`). Shared with hreflang alternate
+ * construction so it stays in sync with route generation.
+ */
+export function getUrlBase(filePath: string | undefined): string {
+  return resolveCollection(filePath).urlBase;
+}
+
+/**
  * Get the full language-aware path of a content entry.
  *
  * Examples:

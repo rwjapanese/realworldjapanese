@@ -9,9 +9,20 @@ target_language: "<lang-code>"               # ISO code: vi, ko, zh, th, id, etc
 diff_needed: true                            # true if a diff spec is warranted, false if base spec is sufficient
 diff_reason: "<one-line justification>"      # e.g. "VI SERP dominated by grammar-heavy academic sources; 40% divergence"
 
+# === GATES ===
+base_performance:                            # Step 2 earn-the-translation snapshot (90-day GSC window)
+  clicks: null
+  impressions: null
+  position: null
+  window_days: 90
+  captured: "YYYY-MM-DD"
+  override_reason: null                      # non-null if the gate was overridden
+
 # === SERP ===
 serp_language: "<lang-code>"                 # Usually same as target_language
 serp_locale: "<locale>"                      # e.g. "vi-VN", "ko-KR"
+serp_source: "websearch"                     # dataforseo | websearch
+target_keyword_local: "<winning variant>"    # Step 4 winner — becomes the localized MDX's targetKeyword
 last_serp_audit: "YYYY-MM-DD"
 
 # === LIFECYCLE ===
@@ -25,6 +36,7 @@ created: "YYYY-MM-DD"
 > - The `seo-article-localize` skill generates this when the target-language SERP diverges materially from the base spec.
 > - If `diff_needed: false`, this file may not be generated at all — the translator works directly from the base spec.
 > - Do NOT duplicate content from the base spec. Only record DELTAS.
+> - The translation QA gate (§8) applies before publishing, regardless of the diff verdict.
 
 ---
 
@@ -33,12 +45,20 @@ created: "YYYY-MM-DD"
 - **Base outline coverage in target SERP:** _X/10 of base spec headings appear in target-language top 10_
 - **Language-unique headings:** _Y new headings not in base spec that appear ≥3 times in target top 10_
 - **Verdict:** _Why the skill decided diff is/isn't needed. Quantitative when possible._
+- **Market reach (non-Google markets only):** _e.g. "ko: Naver holds ~55% of search; Google-reachable share ~40% — acknowledged by user on YYYY-MM-DD"; otherwise "n/a (Google-dominant)"_
+
+### Keyword variants tested (Step 4)
+
+| Variant | Script/form | Suggest richness | Chosen? |
+|---|---|---|---|
+| | kanji / kana / romaji / diacritics / code-mixed | N suggestions | ✅ primary / secondary / rejected |
+| | | | |
 
 ---
 
 ## 2. Target-Language SERP (Top 10)
 
-> Captured on: YYYY-MM-DD. Search engine: Google. Locale: <serp_locale>.
+> Captured on: YYYY-MM-DD. Source: dataforseo | websearch. Search engine: Google. Locale: <serp_locale>.
 
 | # | URL | Domain | Title (original) | Title (EN gloss) | Notes |
 |---|---|---|---|---|---|
@@ -54,6 +74,7 @@ created: "YYYY-MM-DD"
 | 10 | | | | | |
 
 ### Target-language SERP features
+- [ ] AI Overview — **cited domains:** _JA/KO informational queries trigger AIO at high rates; record citations_
 - [ ] Featured snippet
 - [ ] People Also Ask (local-language)
 - [ ] Video carousel
@@ -61,6 +82,9 @@ created: "YYYY-MM-DD"
 
 ### Target-language PAA / related searches
 - ...
+
+### Translated-from-English competitors (weak moat signal)
+- _List any — they mark a winnable wedge for a genuinely localized article_
 
 ---
 
@@ -122,6 +146,7 @@ Legend:
 
 > The outline actually used to write the target-language article.
 > Can be a full rewrite or a pointer to base spec's section 7 with only the additions.
+> Answer-capsule rule carries over: fan-out H2s open with a 40–60 word direct answer in the TARGET language.
 
 - Option A: Reference base spec with deltas
   - Base: see `../<slug>.spec.md` section 7
@@ -135,7 +160,18 @@ Legend:
 
 ---
 
-## 8. Change Log
+## 8. Translation QA
+
+> Gate before publishing (see skill: "Post-draft: translation QA gate").
+> Localized MDX ships with `humanReviewed: false` and its own `targetKeyword` = `target_keyword_local`.
+
+| Date | QA report | Naturalness | Register | Examples | EN leakage | Human review |
+|---|---|---|---|---|---|---|
+| YYYY-MM-DD | `specs/articles/<slug>.<lang>.qa.md` | /5 | /5 | /5 | /5 | pending / ✅ <name> |
+
+---
+
+## 9. Change Log
 
 | Date | Change | Author |
 |---|---|---|

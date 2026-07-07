@@ -11,7 +11,8 @@
     "astro": "astro",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "seo:check": "python3 scripts/validate_seo.py dist"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",

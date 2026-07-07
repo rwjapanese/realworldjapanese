@@ -25,6 +25,9 @@ const commonSchema = z.object({
   targetKeyword: z.string().optional(),
   slug: z.string().optional(),
   isIndexable: z.boolean().default(true),
+  // Translation-QA gate: localized articles are created with
+  // `humanReviewed: false` and flipped to true after a native-speaker review.
+  humanReviewed: z.boolean().optional(),
   // FAQs surfaced to FAQPage JSON-LD in Layout.astro. Keep each `a` as
   // plain prose (no Markdown formatting); the schema is rendered as
   // structured data, not as rich HTML.

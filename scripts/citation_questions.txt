@@ -1,0 +1,57 @@
+# Citation share-of-voice questions for ai_citation_audit.py
+# One English learner question per line. Blank lines and lines starting with #
+# are ignored. Topics mirror src/data/guides/en/ (business Japanese, keigo,
+# business email, meetings, apologies, self-introduction, phone calls,
+# honorifics, workplace culture, IT professionals).
+
+# --- Business Japanese (foundations) ---
+What is business Japanese and how is it different from textbook Japanese?
+What level of Japanese do I need to work in a Japanese company?
+What are the most useful business Japanese phrases to learn first?
+What are the most common business Japanese mistakes foreigners make?
+
+# --- Keigo (honorific language) ---
+What is keigo and why is it important in the Japanese workplace?
+What is the best way to learn keigo as a foreigner?
+What is the difference between sonkeigo and kenjougo?
+Can you give me examples of keigo used in the office?
+What are the most common keigo mistakes to avoid?
+Is there a keigo cheat sheet for beginners at work?
+
+# --- Business email ---
+How do I write a business email in Japanese?
+What is a good Japanese business email template?
+What are the standard opening and closing phrases in a Japanese business email?
+What Japanese email phrases should I know for work?
+
+# --- Meetings ---
+What Japanese phrases do I need for a business meeting?
+How do I politely give my opinion in a Japanese meeting?
+How do I ask a question during a meeting in Japanese?
+
+# --- Apologies and refusals ---
+How do I apologize politely in Japanese at work?
+How do I say sorry to my boss in Japanese?
+How do I politely refuse a request in Japanese?
+How do I decline an invitation politely in Japanese?
+
+# --- Self-introduction ---
+How do I introduce myself in a Japanese business setting?
+What should I say in a Japanese self-introduction (jikoshoukai) at work?
+
+# --- Phone calls ---
+What Japanese phrases do I need to answer a business phone call?
+How do I take a phone message in Japanese at the office?
+
+# --- Honorifics and titles ---
+How do Japanese honorifics and titles work in the workplace?
+When should I use san, sama, and other honorific suffixes at work?
+
+# --- Workplace culture ---
+What is Japanese business etiquette I should know before starting a job?
+What workplace mistakes do foreigners commonly make in Japan?
+What are the polite Japanese phrases I should use around the office every day?
+
+# --- IT professionals / working in Japan ---
+What Japanese do I need as an IT professional or software engineer in Japan?
+What should I know about working in Japan as a foreigner?

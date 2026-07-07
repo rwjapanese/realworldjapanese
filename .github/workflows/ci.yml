@@ -48,3 +48,10 @@ jobs:
 
       - name: "🚀 Build the project"
         run: pnpm run build
+
+      # Velocity check is skipped in CI (--skip-velocity → WARN): PR checkouts
+      # can be stale or contain a batch of new articles for legitimate reasons,
+      # so failing the build on publish-velocity here would be noisy. The other
+      # checks (hreflang/orphans/dates/robots) still hard-fail.
+      - name: "🔎 Run SEO validation"
+        run: python3 scripts/validate_seo.py dist --skip-velocity

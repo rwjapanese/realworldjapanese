@@ -23,16 +23,36 @@ Then run:     scripts/.venv/bin/python scripts/seo_report.py
 """
 import argparse
 import datetime as dt
+import json
 import os
 import pathlib
+import re
 import sys
+import urllib.error
+import urllib.request
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 SCRIPTS_DIR = REPO_ROOT / "scripts"
+DATA_DIR = REPO_ROOT / "src" / "data"
 
 # GSC data lags ~2-3 days; end the window a few days back so the last bucket
 # isn't a half-empty partial day.
 GSC_LAG_DAYS = 3
+
+SITE_ORIGIN = "https://realworldjapanese.com"
+# A page younger than this (by pubDatetime) is still "maturing" — it hasn't had
+# time to rank, so a low position is expected and must NOT be read as decay.
+REFRESH_MATURITY_DAYS = 180
+
+# Collection dir name (under src/data/) → URL base path segment.
+# Note: the blog collection is served under /posts/, not /blog/.
+COLLECTION_URL_BASE = {"guides": "guides", "blog": "posts", "products": "products"}
+
+# GA4 sessionSource values (regex) that indicate an AI assistant referral.
+AI_SOURCE_REGEX = (
+    r"chatgpt\.com|chat\.openai\.com|perplexity|gemini\.google|"
+    r"copilot\.microsoft|claude\.ai"
+)
 
 GSC_SCOPE = "https://www.googleapis.com/auth/webmasters.readonly"
 GA4_SCOPE = "https://www.googleapis.com/auth/analytics.readonly"
@@ -306,6 +326,123 @@ def short_url(url):
 
 
 # --------------------------------------------------------------------------- #
+# Frontmatter parsing (YAML-light, no PyYAML dependency)
+# --------------------------------------------------------------------------- #
+def _strip_scalar(val):
+    """Strip surrounding quotes/whitespace from a YAML scalar value."""
+    val = val.strip()
+    if len(val) >= 2 and val[0] == val[-1] and val[0] in ("'", '"'):
+        return val[1:-1]
+    return val
+
+
+def _parse_iso_date(val):
+    """Parse an ISO date/datetime frontmatter value into a date, or None.
+
+    Handles '2026-05-25', '2026-05-25T00:00:00Z', and
+    '2026-04-18T09:00:00+09:00'. We only need the calendar date for age math,
+    so timezone offsets are ignored (dropped, not applied)."""
+    if not val:
+        return None
+    val = _strip_scalar(val)
+    m = re.match(r"(\d{4})-(\d{2})-(\d{2})", val)
+    if not m:
+        return None
+    try:
+        return dt.date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    except ValueError:
+        return None
+
+
+def parse_frontmatter(text):
+    """Extract top-level `key: value` scalars from the leading `---` block.
+
+    Deliberately shallow: it reads only the top-level scalar keys we care about
+    (pubDatetime, modDatetime, slug, draft, title, targetKeyword) and ignores
+    nested/list structures like `faqs:` and `tags:`. Lines that are indented
+    (part of a nested block) are skipped."""
+    if not text.startswith("---"):
+        return {}
+    end = text.find("\n---", 3)
+    if end == -1:
+        return {}
+    block = text[3:end]
+    fm = {}
+    for raw in block.splitlines():
+        # Skip indented lines (nested list/map items) and blanks/comments.
+        if not raw.strip() or raw[0] in (" ", "\t", "#"):
+            continue
+        if ":" not in raw:
+            continue
+        key, _, val = raw.partition(":")
+        key = key.strip()
+        val = val.strip()
+        # Drop inline comments on plain scalars (not inside quotes).
+        if val and val[0] not in ("'", '"') and " #" in val:
+            val = val.split(" #", 1)[0].strip()
+        fm[key] = val
+    return fm
+
+
+def build_url(collection, lang, slug):
+    """Construct the canonical live URL for a page, with trailing slash:
+    https://realworldjapanese.com/{lang}/{base}/{slug}/"""
+    base = COLLECTION_URL_BASE.get(collection, collection)
+    return f"{SITE_ORIGIN}/{lang}/{base}/{slug}/"
+
+
+def load_content_index():
+    """Walk src/data/**/*.{md,mdx} and return {url: {...meta}} keyed by the live
+    page URL, so it can be joined against GSC page rows.
+
+    Meta per entry: collection, lang, slug, file (repo-relative), pub (date|None),
+    mod (date|None), title, target_keyword. Draft pages are skipped (they don't
+    render). Files whose first path segment isn't a known lang (en|ja) are also
+    skipped, matching the routing's lang extraction."""
+    index = {}
+    if not DATA_DIR.exists():
+        return index
+    for path in sorted(DATA_DIR.rglob("*")):
+        if path.suffix not in (".md", ".mdx"):
+            continue
+        # Ignore underscore-prefixed files (the glob loader excludes them too).
+        if path.name.startswith("_"):
+            continue
+        rel = path.relative_to(DATA_DIR)
+        parts = rel.parts
+        # Expect <collection>/<lang>/<...>/<name>.<ext>
+        if len(parts) < 3:
+            continue
+        collection, lang = parts[0], parts[1]
+        if lang not in ("en", "ja"):
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        fm = parse_frontmatter(text)
+        if _strip_scalar(fm.get("draft", "")).lower() == "true":
+            continue
+        slug_override = _strip_scalar(fm.get("slug", ""))
+        # Slug without an override = id after the lang prefix (path segments
+        # between <lang> and the filename, plus the filename stem).
+        inner = list(parts[2:-1]) + [path.stem]
+        slug = slug_override or "/".join(inner)
+        url = build_url(collection, lang, slug)
+        index[url] = {
+            "collection": collection,
+            "lang": lang,
+            "slug": slug,
+            "file": str(path.relative_to(REPO_ROOT)),
+            "pub": _parse_iso_date(fm.get("pubDatetime", "")),
+            "mod": _parse_iso_date(fm.get("modDatetime", "")),
+            "title": _strip_scalar(fm.get("title", "")),
+            "target_keyword": _strip_scalar(fm.get("targetKeyword", "")),
+        }
+    return index
+
+
+# --------------------------------------------------------------------------- #
 # GA4
 # --------------------------------------------------------------------------- #
 def ga4_section(days, top):
@@ -423,13 +560,438 @@ def ga4_section(days, top):
 
 
 # --------------------------------------------------------------------------- #
+# Module 1: Refresh queue
+# --------------------------------------------------------------------------- #
+def refresh_section(days, top):
+    """Rank published pages by how much a content refresh would pay off.
+
+    Young pages (< REFRESH_MATURITY_DAYS old) are set aside as "maturing" and
+    never scored — a young page ranking poorly is expected, not decayed. The
+    refresh score is impressions weighted 1.5× when the page sits in the
+    striking-distance band (avg position 4–15), where a refresh most reliably
+    moves rankings."""
+    out = ["## リフレッシュ待ち行列（decay / striking-distance で優先度付け）", ""]
+
+    index = load_content_index()
+    if not index:
+        out.append(f"（スキップ: {DATA_DIR} に記事が見つからない）")
+        return "\n".join(out)
+
+    try:
+        from googleapiclient.discovery import build
+
+        creds = get_credentials([GSC_SCOPE])
+        service = build("searchconsole", "v1", credentials=creds, cache_discovery=False)
+        site_url = require("GSC_SITE_URL")
+        end = dt.date.today() - dt.timedelta(days=GSC_LAG_DAYS)
+        start = end - dt.timedelta(days=days - 1)
+        pages = gsc_query(service, site_url, start, end, dimensions=["page"], row_limit=1000)
+    except SystemExit:
+        raise
+    except Exception as e:
+        out.append(f"（スキップ: GSC 取得に失敗 — {e}）")
+        return "\n".join(out)
+
+    today = dt.date.today()
+    maturing = []       # young pages, excluded from scoring
+    candidates = []     # (url, age_days, clicks, impr, pos, score)
+    for r in pages:
+        url = r["keys"][0]
+        meta = index.get(url) or index.get(url.rstrip("/") + "/")
+        if not meta:
+            continue  # non-article URL (home, tag pages, etc.)
+        c, i, ctr, pos = fmt_row(r)
+        pub = meta.get("pub")
+        age = (today - pub).days if pub else None
+        if age is not None and age < REFRESH_MATURITY_DAYS:
+            maturing.append(url)
+            continue
+        score = i * (1.5 if 4 <= pos <= 15 else 1.0)
+        candidates.append((url, age, int(c), int(i), pos, score))
+
+    out.append(
+        f"- 対象ウィンドウ: {start} 〜 {end}（直近 {days} 日）"
+    )
+    out.append(
+        f"- 育成中（pub < {REFRESH_MATURITY_DAYS} 日, リフレッシュ対象から除外）: "
+        f"{len(maturing)} 本"
+    )
+    out.append("")
+
+    if not candidates:
+        out.append("（該当なし — 成熟済みでインプレッションのある記事がまだない）")
+        out.append("")
+        return "\n".join(out)
+
+    candidates.sort(key=lambda x: -x[5])
+    out.append("### リフレッシュ優先度（score = impr × 1.5[pos 4–15 のとき]）")
+    out.append("| ページ | age日 | impr | clicks | pos | score | 推奨アクション |")
+    out.append("|---|--:|--:|--:|--:|--:|---|")
+    for url, age, c, i, pos, score in candidates[:top]:
+        age_s = str(age) if age is not None else "?"
+        out.append(
+            f"| {short_url(url)} | {age_s} | {i} | {c} | {pos:.1f} | {score:.0f} | "
+            f"re-run spec SERP analysis via seo-article-refresh |"
+        )
+    out.append("")
+    return "\n".join(out)
+
+
+# --------------------------------------------------------------------------- #
+# Module 2: Cannibalization
+# --------------------------------------------------------------------------- #
+CANNIBAL_WINDOW_DAYS = 90
+BRAND_TERMS = ("real world japanese", "realworldjapanese")
+
+
+def cannibal_section(top):
+    """Find queries where two or more of our pages split the impressions —
+    a sign they compete for the same intent. Uses a fixed 90-day window
+    (independent of --days) so low-volume queries accumulate enough signal."""
+    out = ["## カニバリゼーション点検（同一クエリを複数ページで奪い合い / 直近90日）", ""]
+
+    try:
+        from googleapiclient.discovery import build
+
+        creds = get_credentials([GSC_SCOPE])
+        service = build("searchconsole", "v1", credentials=creds, cache_discovery=False)
+        site_url = require("GSC_SITE_URL")
+        end = dt.date.today() - dt.timedelta(days=GSC_LAG_DAYS)
+        start = end - dt.timedelta(days=CANNIBAL_WINDOW_DAYS - 1)
+        rows = gsc_query(
+            service, site_url, start, end,
+            dimensions=["query", "page"], row_limit=25000,
+        )
+    except SystemExit:
+        raise
+    except Exception as e:
+        out.append(f"（スキップ: GSC 取得に失敗 — {e}）")
+        return "\n".join(out)
+
+    # Aggregate impressions per (query -> page).
+    by_query = {}  # query -> {page: impressions}
+    for r in rows:
+        q, page = r["keys"][0], r["keys"][1]
+        ql = q.lower()
+        if any(b in ql for b in BRAND_TERMS):
+            continue
+        by_query.setdefault(q, {})
+        by_query[q][page] = by_query[q].get(page, 0) + r["impressions"]
+
+    flagged = []  # (query, total, [(page, share)])
+    for q, pagemap in by_query.items():
+        total = sum(pagemap.values())
+        if total < 30:
+            continue
+        big = [(p, imp / total) for p, imp in pagemap.items() if imp / total > 0.20]
+        if len(big) >= 2:
+            big.sort(key=lambda x: -x[1])
+            flagged.append((q, total, big))
+
+    out.append(f"- 対象ウィンドウ: {start} 〜 {end}（固定90日）")
+    out.append(
+        "- 条件: ブランドクエリ除外・総impr≥30・2ページ以上がそれぞれimprの20%超"
+    )
+    out.append("")
+
+    if not flagged:
+        out.append("（該当なし — 目立ったカニバリはない）")
+        out.append("")
+        return "\n".join(out)
+
+    flagged.sort(key=lambda x: -x[1])
+    out.append("| クエリ | ページ | 分割% | 総impr | メモ |")
+    out.append("|---|---|---|--:|---|")
+    for q, total, big in flagged[:top]:
+        pages_s = "<br>".join(short_url(p) for p, _ in big)
+        share_s = "<br>".join(f"{share * 100:.0f}%" for _, share in big)
+        out.append(
+            f"| {q} | {pages_s} | {share_s} | {int(total)} | "
+            f"same intent — consider consolidating or differentiating |"
+        )
+    out.append("")
+    return "\n".join(out)
+
+
+# --------------------------------------------------------------------------- #
+# Module 3: Alerts (WoW traffic step-change + Google update overlap)
+# --------------------------------------------------------------------------- #
+def _gsc_totals(service, site_url, start, end):
+    rows = gsc_query(service, site_url, start, end, dimensions=[], row_limit=1)
+    if not rows:
+        return 0, 0
+    return int(rows[0]["clicks"]), int(rows[0]["impressions"])
+
+
+def _google_search_incidents(window_start, window_end):
+    """Fetch the Google Search Status dashboard incidents JSON and return those
+    that overlap [window_start, window_end] as (begin_date, title) tuples.
+    Returns None on any network/parse error so callers can skip gracefully."""
+    url = "https://status.search.google.com/incidents.json"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "rwj-seo-report/1.0"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except (urllib.error.URLError, json.JSONDecodeError, OSError, ValueError):
+        return None
+
+    def _to_date(s):
+        if not s:
+            return None
+        m = re.match(r"(\d{4})-(\d{2})-(\d{2})", s)
+        if not m:
+            return None
+        try:
+            return dt.date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        except ValueError:
+            return None
+
+    incidents = []
+    for inc in data if isinstance(data, list) else []:
+        begin = _to_date(inc.get("begin"))
+        # An open incident has no `end`; treat it as ongoing (overlaps).
+        end = _to_date(inc.get("end")) or window_end
+        if begin is None:
+            continue
+        if begin <= window_end and end >= window_start:
+            incidents.append((begin, inc.get("external_desc") or inc.get("uri") or "(no title)"))
+    incidents.sort(key=lambda x: x[0])
+    return incidents
+
+
+def alerts_section():
+    """Week-over-week site-wide traffic delta plus any Google Search ranking
+    incidents overlapping the last 28 days, so a traffic step-change can be
+    lined up against a known Google update."""
+    out = ["## アラート（WoW トラフィック急変 + Google アップデート重なり）", ""]
+
+    try:
+        from googleapiclient.discovery import build
+
+        creds = get_credentials([GSC_SCOPE])
+        service = build("searchconsole", "v1", credentials=creds, cache_discovery=False)
+        site_url = require("GSC_SITE_URL")
+    except SystemExit:
+        raise
+    except Exception as e:
+        out.append(f"（スキップ: GSC 認証/接続に失敗 — {e}）")
+        return "\n".join(out)
+
+    # Last 7 full days (respecting lag) vs the prior 7.
+    last_end = dt.date.today() - dt.timedelta(days=GSC_LAG_DAYS)
+    last_start = last_end - dt.timedelta(days=6)
+    prev_end = last_start - dt.timedelta(days=1)
+    prev_start = prev_end - dt.timedelta(days=6)
+
+    try:
+        cur_c, cur_i = _gsc_totals(service, site_url, last_start, last_end)
+        prev_c, prev_i = _gsc_totals(service, site_url, prev_start, prev_end)
+    except Exception as e:
+        out.append(f"（スキップ: GSC 取得に失敗 — {e}）")
+        return "\n".join(out)
+
+    def _delta(cur, prev):
+        if prev == 0:
+            return None
+        return (cur - prev) / prev * 100.0
+
+    di = _delta(cur_i, prev_i)
+    dc = _delta(cur_c, prev_c)
+    out.append(f"- 直近7日: {last_start} 〜 {last_end} / 前7日: {prev_start} 〜 {prev_end}")
+    out.append(
+        f"- 表示回数: {prev_i:,} → {cur_i:,}"
+        + (f"（{di:+.0f}%）" if di is not None else "（前週0のため%算出不可）")
+    )
+    out.append(
+        f"- クリック: {prev_c:,} → {cur_c:,}"
+        + (f"（{dc:+.0f}%）" if dc is not None else "（前週0のため%算出不可）")
+    )
+    if di is not None and di <= -30:
+        out.append("")
+        out.append(f"⚠️ 表示回数が前週比 {di:.0f}% — 急落。下のアップデート一覧と突き合わせを。")
+    out.append("")
+
+    # Google Search Status incidents overlapping the last 28 days.
+    inc_start = dt.date.today() - dt.timedelta(days=28)
+    inc_end = dt.date.today()
+    incidents = _google_search_incidents(inc_start, inc_end)
+    out.append("### Google 検索ステータス（直近28日に重なるインシデント）")
+    if incidents is None:
+        out.append("（スキップ: status.search.google.com への接続に失敗）")
+    elif not incidents:
+        out.append("（直近28日に重なる公表インシデントなし）")
+    else:
+        out.append("| 開始日 | タイトル |")
+        out.append("|---|---|")
+        for begin, title in incidents:
+            out.append(f"| {begin} | {title} |")
+    out.append("")
+    return "\n".join(out)
+
+
+# --------------------------------------------------------------------------- #
+# Module 4: AI surfaces (LLM referral traffic)
+# --------------------------------------------------------------------------- #
+def ai_section(top):
+    """Report traffic arriving from AI assistants, two ways: by the GA4
+    'AI Assistant' default channel group (available since May 2026), and by a
+    source-regex fallback that also breaks out landing pages. Organic Search is
+    shown alongside as the baseline for comparison."""
+    out = ["## AI 流入面（LLM アシスタント経由の流入）", ""]
+
+    try:
+        from google.analytics.data_v1beta import BetaAnalyticsDataClient
+        from google.analytics.data_v1beta.types import (
+            DateRange,
+            Dimension,
+            Metric,
+            RunReportRequest,
+            Filter,
+            FilterExpression,
+        )
+    except ImportError:
+        out.append("（スキップ: google-analytics-data 未インストール）")
+        return "\n".join(out)
+
+    try:
+        creds = get_credentials([GA4_SCOPE])
+        client = BetaAnalyticsDataClient(credentials=creds)
+        prop = require("GA4_PROPERTY_ID")
+    except SystemExit:
+        raise
+    except Exception as e:
+        out.append(f"（スキップ: GA4 認証に失敗 — {e}）")
+        return "\n".join(out)
+
+    property_path = f"properties/{prop}"
+    date_range = DateRange(start_date="28daysAgo", end_date="today")
+    out.append("- ウィンドウ: 直近28日")
+    out.append("")
+
+    # (a) By default channel group — look for the "AI Assistant" group.
+    try:
+        by_channel = client.run_report(
+            RunReportRequest(
+                property=property_path,
+                date_ranges=[date_range],
+                dimensions=[Dimension(name="sessionDefaultChannelGroup")],
+                metrics=[Metric(name="sessions"), Metric(name="engagedSessions")],
+            )
+        )
+        channel_map = {
+            r.dimension_values[0].value: (
+                int(r.metric_values[0].value or 0),
+                int(r.metric_values[1].value or 0),
+            )
+            for r in by_channel.rows
+        }
+        out.append("### チャネルグループ別（AI Assistant / Organic Search）")
+        out.append("| チャネル | sessions | engaged sessions |")
+        out.append("|---|--:|--:|")
+        if "AI Assistant" in channel_map:
+            s, e = channel_map["AI Assistant"]
+            out.append(f"| AI Assistant | {s} | {e} |")
+        else:
+            out.append("| AI Assistant | — | （このチャネル値はまだ出現していない） |")
+        if "Organic Search" in channel_map:
+            s, e = channel_map["Organic Search"]
+            out.append(f"| Organic Search | {s} | {e} |")
+        out.append("")
+    except Exception as e:
+        out.append(f"（チャネルグループ取得をスキップ — {e}）")
+        out.append("")
+
+    # (b) Source-regex fallback + landing-page breakdown, AI vs Organic.
+    def _source_report(dimensions, dim_filter):
+        return client.run_report(
+            RunReportRequest(
+                property=property_path,
+                date_ranges=[date_range],
+                dimensions=dimensions,
+                metrics=[Metric(name="sessions"), Metric(name="engagedSessions")],
+                dimension_filter=dim_filter,
+                limit=top,
+            )
+        )
+
+    ai_filter = FilterExpression(
+        filter=Filter(
+            field_name="sessionSource",
+            string_filter=Filter.StringFilter(
+                match_type=Filter.StringFilter.MatchType.FULL_REGEXP,
+                value=AI_SOURCE_REGEX,
+                case_sensitive=False,
+            ),
+        )
+    )
+    organic_filter = FilterExpression(
+        filter=Filter(
+            field_name="sessionDefaultChannelGroup",
+            string_filter=Filter.StringFilter(value="Organic Search"),
+        )
+    )
+
+    try:
+        ai_tot = _source_report([Dimension(name="sessionSource")], ai_filter)
+        ai_sessions = sum(int(r.metric_values[0].value or 0) for r in ai_tot.rows)
+        ai_engaged = sum(int(r.metric_values[1].value or 0) for r in ai_tot.rows)
+        org_tot = _source_report([Dimension(name="sessionDefaultChannelGroup")], organic_filter)
+        org_sessions = sum(int(r.metric_values[0].value or 0) for r in org_tot.rows)
+        org_engaged = sum(int(r.metric_values[1].value or 0) for r in org_tot.rows)
+
+        out.append("### ソース正規表現による AI 流入 vs Organic Search")
+        out.append("| 区分 | sessions | engaged sessions |")
+        out.append("|---|--:|--:|")
+        out.append(f"| AI アシスタント（{AI_SOURCE_REGEX}） | {ai_sessions} | {ai_engaged} |")
+        out.append(f"| Organic Search | {org_sessions} | {org_engaged} |")
+        out.append("")
+
+        if ai_tot.rows:
+            out.append("#### AI 流入のソース内訳")
+            out.append("| source | sessions | engaged |")
+            out.append("|---|--:|--:|")
+            for r in sorted(ai_tot.rows, key=lambda r: -int(r.metric_values[0].value or 0)):
+                out.append(
+                    f"| {r.dimension_values[0].value} | "
+                    f"{r.metric_values[0].value} | {r.metric_values[1].value} |"
+                )
+            out.append("")
+
+        ai_land = _source_report(
+            [Dimension(name="landingPagePlusQueryString")], ai_filter
+        )
+        if ai_land.rows:
+            out.append(f"#### AI 流入の着地ページ（上位 {min(top, len(ai_land.rows))}）")
+            out.append("| ページ | sessions | engaged |")
+            out.append("|---|--:|--:|")
+            for r in sorted(ai_land.rows, key=lambda r: -int(r.metric_values[0].value or 0))[:top]:
+                out.append(
+                    f"| {r.dimension_values[0].value} | "
+                    f"{r.metric_values[0].value} | {r.metric_values[1].value} |"
+                )
+            out.append("")
+        else:
+            out.append("（AI 流入の着地ページはまだなし）")
+            out.append("")
+    except Exception as e:
+        out.append(f"（ソース内訳をスキップ — {e}）")
+        out.append("")
+
+    return "\n".join(out)
+
+
+# --------------------------------------------------------------------------- #
 # main
 # --------------------------------------------------------------------------- #
 def main():
     parser = argparse.ArgumentParser(description="GSC + GA4 weekly SEO report")
     parser.add_argument("--days", type=int, default=28, help="lookback window (default 28)")
     parser.add_argument("--top", type=int, default=25, help="rows per table (default 25)")
-    parser.add_argument("--only", choices=["gsc", "ga4"], help="run only one source")
+    parser.add_argument(
+        "--only",
+        choices=["gsc", "ga4", "refresh", "cannibal", "alerts", "ai"],
+        help="run only one section",
+    )
     parser.add_argument(
         "--login",
         action="store_true",
@@ -446,10 +1008,21 @@ def main():
     today = dt.date.today().isoformat()
     print(f"# SEO トラッカー — 取得日 {today}\n")
 
-    if args.only != "ga4":
+    # Full report (no --only) runs every section in order; --only <name> runs
+    # just that one. Each section degrades gracefully on data-source failure.
+    only = args.only
+    if only in (None, "gsc"):
         print(gsc_section(args.days, args.top))
-    if args.only != "gsc":
+    if only in (None, "ga4"):
         print(ga4_section(args.days, args.top))
+    if only in (None, "refresh"):
+        print(refresh_section(args.days, args.top))
+    if only in (None, "cannibal"):
+        print(cannibal_section(args.top))
+    if only in (None, "alerts"):
+        print(alerts_section())
+    if only in (None, "ai"):
+        print(ai_section(args.top))
 
 
 if __name__ == "__main__":

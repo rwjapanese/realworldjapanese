@@ -12,6 +12,13 @@ import {
 import { transformerFileName } from "./src/utils/transformers/fileName";
 import { SITE } from "./src/config";
 import { LANGUAGES } from "./src/config/languages";
+import { buildLastmodMap } from "./src/utils/sitemapLastmod";
+
+// Built once at config-eval time: absolute article URL → lastmod (ISO 8601).
+// Used by the sitemap `serialize` hook below. URLs not in the map (index,
+// tags, about, archives) are intentionally left without a lastmod — we never
+// stamp build time, which would forfeit Google's lastmod trust signal.
+const lastmodMap = buildLastmodMap(SITE.website);
 
 // https://astro.build/config
 export default defineConfig({
@@ -27,6 +34,17 @@ export default defineConfig({
         locales: Object.fromEntries(
           LANGUAGES.filter(l => l.active).map(l => [l.code, l.htmlLang])
         ),
+      },
+      serialize(item) {
+        const lastmod = lastmodMap[item.url];
+        if (lastmod) {
+          item.lastmod = lastmod;
+        } else {
+          // Leave lastmod unset for non-article URLs rather than defaulting to
+          // build time.
+          delete item.lastmod;
+        }
+        return item;
       },
     }),
   ],
