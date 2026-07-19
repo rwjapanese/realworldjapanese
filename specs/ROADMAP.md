@@ -158,9 +158,9 @@ The user reads this file when they open a new chat. Keep it scannable.
 
 ### P1 — Known issues on shipped content
 
-- [ ] **beehiiv 購読 URL の設定（EmailCTA 有効化）.**
-  - 2026-07-03 に EmailCTA（無料PDF「Saying No 5」→ メールリスト導線）を全46記事に実装済みだが、beehiiv 未開設のため `src/config/newsletter.ts` の `NEWSLETTER_SUBSCRIBE_URL` が空 ＝ **現状は何もレンダリングされない**（意図的なセーフガード）。
-  - beehiiv 開設後、購読ページ URL を貼るだけで全記事に CTA が出現する。貼ったら `pnpm build` → 生成 HTML で「EmailCTA 箱 → ProductCTA 箱 → 関連見出し」の順序をスポット確認。
+- [x] **beehiiv 購読 URL の設定（EmailCTA 有効化）— 完了 2026-07-19.**
+  - beehiiv publication 開設（`realworldjapanese.beehiiv.com`）→ `NEWSLETTER_SUBSCRIBE_URL` に `/subscribe` を設定（commit `b393d87`）。`pnpm build` で dist 46ファイルに CTA レンダリング確認済、全記事で EmailCTA が表示に切替。
+  - リードマグネット配信: 無料PDF「Saying No 5」を `public/downloads/saying-no-5.pdf` にホスト（commit `063ce0b`、https://realworldjapanese.com/downloads/saying-no-5.pdf で 200 配信）。beehiiv の Welcome 自動化（トリガー Signed up → Send email、日の丸カラーの赤バナー #E4032E）から当該URLにリンク。自動化は Live、実メールで登録テスト → Welcome メール受信を確認。
   - 親タスク: `work/AEIOU/todo/需要検証_実行キット.md` §0 Week 1-2。
 
 - [ ] **FAQPage JSON-LD schema** (site-wide infrastructure).
