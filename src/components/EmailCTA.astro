@@ -1,0 +1,67 @@
+---
+// Reusable email-list CTA box (free "Saying No 5" PDF via beehiiv signup).
+// Sits directly above ProductCTA at the end of every article; renders nothing
+// until NEWSLETTER_SUBSCRIBE_URL is configured in src/config/newsletter.ts.
+// Defaults are language-aware (ja/en); pass props only to override per article.
+import { NEWSLETTER_SUBSCRIBE_URL } from "@/config/newsletter";
+
+type Props = {
+  lang?: string;
+  href?: string;
+  eyebrow?: string;
+  title?: string;
+  blurb?: string;
+  cta?: string;
+  note?: string;
+};
+
+const copy = {
+  ja: {
+    eyebrow: "無料PDF",
+    title: "Saying No 5 — 断り方の実例PDF（英語解説）",
+    blurb:
+      "外国人メンバーにそのまま渡せる無料PDF。職場で角が立たない「断り方」5場面を、NG例とA/B/Cレベル注釈つきで収録。登録メールアドレスに届きます。",
+    cta: "無料PDFを受け取る",
+    note: "無料・週1通の職場フレーズ配信（英語）つき・いつでも解除できます",
+  },
+  en: {
+    eyebrow: "Free PDF",
+    title: "Saying No in Japanese — 5 Work Situations",
+    blurb:
+      "A free preview of The Essential 30: five ways to say no at work without sounding rude — each with what NOT to say and casual / work-safe / formal versions. Sent straight to your inbox.",
+    cta: "Get the free PDF",
+    note: "Free · one work-safe phrase a week · unsubscribe anytime",
+  },
+};
+
+const { lang = "ja", href = NEWSLETTER_SUBSCRIBE_URL } = Astro.props;
+
+const base = lang === "en" ? copy.en : copy.ja;
+const eyebrow = Astro.props.eyebrow ?? base.eyebrow;
+const title = Astro.props.title ?? base.title;
+const blurb = Astro.props.blurb ?? base.blurb;
+const cta = Astro.props.cta ?? base.cta;
+const note = Astro.props.note ?? base.note;
+---
+
+{
+  href && (
+    <aside class="not-prose my-10 rounded-lg border border-accent/40 bg-muted/40 p-6 shadow-sm">
+      <p class="mb-1 text-xs font-semibold tracking-wide text-accent uppercase">
+        {eyebrow}
+      </p>
+      <p class="mb-2 text-lg font-semibold text-foreground">{title}</p>
+      <p class="mb-5 text-sm leading-relaxed text-foreground/80">{blurb}</p>
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener"
+        class="inline-flex items-center gap-2 rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-background no-underline transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        {cta}
+        <span aria-hidden="true">→</span>
+      </a>
+      <p class="mt-3 text-xs text-foreground/60">{note}</p>
+    </aside>
+  )
+}
