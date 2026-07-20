@@ -29,6 +29,7 @@ import pathlib
 import re
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -53,6 +54,16 @@ AI_SOURCE_REGEX = (
     r"chatgpt\.com|chat\.openai\.com|perplexity|gemini\.google|"
     r"copilot\.microsoft|claude\.ai"
 )
+
+# beehiiv API. The email list is the sprint's most important KPI, so its section
+# runs first. These emails are the owner's own test signups — netting them out
+# gives the "real" acquisition count the Go/No-Go gate is judged on.
+BEEHIIV_API_BASE = "https://api.beehiiv.com/v2"
+BEEHIIV_TEST_EMAILS = {
+    "hello.rwjapanese@gmail.com",
+    "ryaryuryoooue@gmail.com",
+    "r.oue@arin-tech.co.jp",
+}
 
 GSC_SCOPE = "https://www.googleapis.com/auth/webmasters.readonly"
 GA4_SCOPE = "https://www.googleapis.com/auth/analytics.readonly"
@@ -981,6 +992,114 @@ def ai_section(top):
 
 
 # --------------------------------------------------------------------------- #
+# beehiiv (email list — the sprint's most important KPI)
+# --------------------------------------------------------------------------- #
+def _beehiiv_get(path, api_key, params=None):
+    """GET {BEEHIIV_API_BASE}{path} with Bearer auth, return parsed JSON."""
+    url = f"{BEEHIIV_API_BASE}{path}"
+    if params:
+        url += "?" + urllib.parse.urlencode(params)
+    req = urllib.request.Request(url, headers={"Authorization": f"Bearer {api_key}"})
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
+
+def _beehiiv_all_subscriptions(pub_id, api_key):
+    """Page through every subscription (cursor pagination — the endpoint returns
+    no total count) and return the raw list."""
+    rows = []
+    cursor = None
+    while True:
+        params = {"limit": 100}
+        if cursor:
+            params["cursor"] = cursor
+        data = _beehiiv_get(f"/publications/{pub_id}/subscriptions", api_key, params)
+        rows.extend(data.get("data", []))
+        if not data.get("has_more"):
+            break
+        cursor = data.get("next_cursor")
+        if not cursor:
+            break
+    return rows
+
+
+def beehiiv_section(days):
+    """Email-list KPI: total active subscribers, new signups in the window, and
+    a channel breakdown (utm_source/medium) so the sprint can see WHICH channel
+    is acquiring — the Go/No-Go 'channel 成立' gate. Owner test emails are netted
+    out to give the real acquisition count."""
+    out = ["## 📧 メール登録（最重要KPI — beehiiv）", ""]
+
+    api_key = os.environ.get("BEEHIIV_API_KEY")
+    pub_id = os.environ.get("BEEHIIV_PUBLICATION_ID")
+    if not api_key or not pub_id:
+        out.append(
+            "（スキップ: BEEHIIV_API_KEY / BEEHIIV_PUBLICATION_ID が未設定。"
+            "scripts/.env に設定すると登録数が自動取得されます）"
+        )
+        out.append("")
+        return "\n".join(out)
+
+    try:
+        subs = _beehiiv_all_subscriptions(pub_id, api_key)
+    except urllib.error.HTTPError as e:
+        out.append(f"（スキップ: beehiiv API {e.code} — キー失効/権限を確認）")
+        out.append("")
+        return "\n".join(out)
+    except Exception as e:
+        out.append(f"（スキップ: beehiiv 取得に失敗 — {e}）")
+        out.append("")
+        return "\n".join(out)
+
+    active = [s for s in subs if s.get("status") == "active"]
+    real = [s for s in active if (s.get("email") or "").lower() not in BEEHIIV_TEST_EMAILS]
+    tests = len(active) - len(real)
+
+    cutoff = dt.datetime.now(dt.timezone.utc).timestamp() - days * 86400
+    new_real = [s for s in real if (s.get("created") or 0) >= cutoff]
+
+    out.append(f"- ウィンドウ: 直近 {days} 日")
+    out.append(
+        f"- **実登録（テスト除く）: {len(real)} 件**"
+        f"（うち直近{days}日で新規 {len(new_real)} 件）"
+        f" ／ 全 active {len(active)} 件（テスト {tests} 件を含む）"
+    )
+    # Go/No-Go context (実行プラン §2): Go ≥60 / 条件付き 25-59 / No-Go <25.
+    n = len(real)
+    if n >= 60:
+        gate = "🟢 **Go 圏（≥60）**"
+    elif n >= 25:
+        gate = "🟡 条件付き継続圏（25-59）"
+    else:
+        gate = "🔴 No-Go 圏（<25）— 配布を実行した上で 8/28 判定"
+    out.append(f"- Go/No-Go 進捗（8/28 判定・実登録ベース）: {gate}")
+    out.append("")
+
+    # Channel attribution — which source is actually acquiring (the '成立' gate).
+    if real:
+        from collections import Counter
+
+        def _lab(s):
+            src = (s.get("utm_source") or "direct").strip() or "direct"
+            med = (s.get("utm_medium") or "").strip()
+            return f"{src} / {med}" if med else src
+
+        by_ch = Counter(_lab(s) for s in real)
+        out.append("### 獲得チャネル内訳（実登録 utm_source / medium）")
+        out.append("| チャネル | 実登録 | 直近窓の新規 |")
+        out.append("|---|--:|--:|")
+        new_by_ch = Counter(_lab(s) for s in new_real)
+        for ch, c in by_ch.most_common():
+            out.append(f"| {ch} | {c} | {new_by_ch.get(ch, 0)} |")
+        out.append("")
+    else:
+        out.append("（実登録はまだゼロ。配布導線を稼働中）")
+        out.append("")
+
+    return "\n".join(out)
+
+
+# --------------------------------------------------------------------------- #
 # main
 # --------------------------------------------------------------------------- #
 def main():
@@ -989,7 +1108,7 @@ def main():
     parser.add_argument("--top", type=int, default=25, help="rows per table (default 25)")
     parser.add_argument(
         "--only",
-        choices=["gsc", "ga4", "refresh", "cannibal", "alerts", "ai"],
+        choices=["email", "gsc", "ga4", "refresh", "cannibal", "alerts", "ai"],
         help="run only one section",
     )
     parser.add_argument(
@@ -1011,6 +1130,8 @@ def main():
     # Full report (no --only) runs every section in order; --only <name> runs
     # just that one. Each section degrades gracefully on data-source failure.
     only = args.only
+    if only in (None, "email"):
+        print(beehiiv_section(args.days))
     if only in (None, "gsc"):
         print(gsc_section(args.days, args.top))
     if only in (None, "ga4"):
