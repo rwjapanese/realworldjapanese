@@ -46,7 +46,11 @@ const note = Astro.props.note ?? base.note;
 
 {
   href && (
-    <aside class="not-prose my-10 rounded-lg border border-accent/40 bg-muted/40 p-6 shadow-sm">
+    <aside
+      data-email-cta
+      data-cta-lang={lang}
+      class="not-prose my-10 rounded-lg border border-accent/40 bg-muted/40 p-6 shadow-sm"
+    >
       <p class="mb-1 text-xs font-semibold tracking-wide text-accent uppercase">
         {eyebrow}
       </p>
@@ -56,6 +60,7 @@ const note = Astro.props.note ?? base.note;
         href={href}
         target="_blank"
         rel="noopener"
+        data-email-cta-link
         class="inline-flex items-center gap-2 rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-background no-underline transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
         {cta}
@@ -65,3 +70,41 @@ const note = Astro.props.note ?? base.note;
     </aside>
   )
 }
+
+<script>
+  // GA4 funnel denominators: email_cta_view fires once when the box becomes
+  // >=50% visible, email_cta_click on the subscribe link. cta_type "inline"
+  // distinguishes this box from the popup (EmailPopup.astro).
+  function sendCtaEvent(name: string, params: Record<string, string>) {
+    const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void })
+      .gtag;
+    if (typeof gtag === "function") gtag("event", name, params);
+  }
+
+  function setupEmailCtaTracking() {
+    document.querySelectorAll<HTMLElement>("[data-email-cta]").forEach(box => {
+      if (box.dataset.ctaBound === "1") return;
+      box.dataset.ctaBound = "1";
+      const lang = box.dataset.ctaLang ?? "ja";
+
+      const observer = new IntersectionObserver(
+        entries => {
+          if (entries.some(e => e.isIntersecting)) {
+            sendCtaEvent("email_cta_view", { cta_type: "inline", lang });
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.5 }
+      );
+      observer.observe(box);
+
+      box
+        .querySelector<HTMLAnchorElement>("[data-email-cta-link]")
+        ?.addEventListener("click", () => {
+          sendCtaEvent("email_cta_click", { cta_type: "inline", lang });
+        });
+    });
+  }
+
+  document.addEventListener("astro:page-load", setupEmailCtaTracking);
+</script>
