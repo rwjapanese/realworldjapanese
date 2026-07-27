@@ -1,7 +1,8 @@
 ---
-title: "Japanese for IT Professionals: A Working Engineer's Guide"
-description: "Practical Japanese for software engineers in Japan — phrases for standups, PR reviews, sprint planning, demos, retros, and client calls, plus a week-1 survival deck and a JLPT-to-task ladder. Two-thirds of what vocab lists never tell you."
+title: "Japanese for IT Professionals & Software Engineers: A Working Guide"
+description: "Practical Japanese for software engineers in Japan — phrases for standups, PR reviews, commit messages, sprint planning, demos, retros, and client calls, plus a week-1 survival deck and a JLPT-to-task ladder. Two-thirds of what vocab lists never tell you."
 pubDatetime: 2026-05-13T00:00:00Z
+modDatetime: 2026-07-27T00:00:00Z
 cluster: "tech-japanese"
 tags: ["tech-japanese", "software-engineers", "workplace", "business-japanese", "guide"]
 author: "Real-World Japanese"
@@ -16,7 +17,7 @@ faqs:
   - q: "Is katakana enough for tech work?"
     a: "For token vocabulary, mostly yes. For the sentence around the noun — how to ask, suggest, push back, escalate, defer — no. Katakana tech words live inside Japanese grammar, and the grammar is where register, politeness, and team-culture nuance happens. That's why this guide focuses on phrases, not tokens."
   - q: "How do you say \"deploy\" or \"merge\" in Japanese?"
-    a: "Deplyo (デプロイ) and ma-ji (マージ). The tokens are easy. The interesting choices are around them: deplyo shimasu (polite default), deplyo shitokimasu (casual same-side), deplyo sasete-itadakimasu (over-polite to client). Picking the right register is the actual skill."
+    a: "Depuroi (デプロイ) and ma-ji (マージ). The tokens are easy. The interesting choices are around them: depuroi shimasu (polite default), depuroi shitokimasu (casual same-side), depuroi sasete-itadakimasu (over-polite to client). Picking the right register is the actual skill."
   - q: "What's the most common Japanese mistake foreign engineers make?"
     a: "Using ryōkai-desu (了解です) upward in PR comments and Slack DMs. Ryōkai carries a faint top-down tone. Safe peer-to-peer; reads as casual when sent to a tech lead or external reviewer. Swap for shōchi shimashita / shōchi itashimashita and you've made the single highest-ROI keigo fix available to a foreign engineer."
 ---
@@ -28,7 +29,7 @@ import EmailCTA from "@/components/EmailCTA.astro";
 
 ---
 
-Japanese for IT professionals splits across two axes most vocab lists ignore. You need (a) the right **politeness register** — *keigo*, polite, or casual — for the moment, and (b) phrases for **engineer-specific rituals**: PR reviews, standups, sprint planning, demos, retros, and client calls. This guide gives you both, plus a week-1 survival deck and a JLPT-to-task ladder.
+Japanese for IT professionals — software engineers, SREs, QA, data — splits across two axes most vocab lists ignore. You need (a) the right **politeness register** — *keigo*, polite, or casual — for the moment, and (b) phrases for **engineer-specific rituals**: PR reviews, commit messages, standups, sprint planning, demos, retros, and client calls. This guide gives you both, plus a week-1 survival deck and a JLPT-to-task ladder.
 
 If you've already memorized 200 katakana tech terms and still freeze when asking for a PR review, you're missing the half that matters most at work. Let's fix that.
 
@@ -158,6 +159,22 @@ PR threads in Japanese are where most foreign engineers get caught off-guard —
 
 > **Common mistake:** Writing *ryōkai-desu* (了解です) on a PR comment when the reviewer is your tech lead or external. *Ryōkai* reads as casual-upward. With anyone above you or outside your team, swap it for *shōchi shimashita* — same length, much safer landing. See [the keigo mistakes guide](/en/guides/keigo-mistakes/) for the full breakdown.
 
+### Commit messages and PR descriptions
+
+The comment thread is only half of a PR. The **commit message** and the **description body** have their own register rules, and they're the opposite of what most people assume.
+
+- **Commit messages:** keep them terse. English imperative is widely accepted on Japanese teams (`fix: handle null user`); if your team writes Japanese, stay verb-final and short — *ユーザーがnullの場合を修正* (fixed the null-user case). **Never add *keigo* to a commit message.** It's a log line, not a letter — *shūsei sasete-itadakimasu* in a commit reads as bizarre.
+- **PR description body:** this is where register matters, but the trap is *over*-formalizing it. Write it in **plain polite (B)** — full *desu / masu* sentences, no heavy *keigo*. A reviewer reads it like a short status report, not a client email.
+
+| Part | Register | Example |
+|---|---|---|
+| PR title | plain / B | *X no shūsei — Y no baai ni taiō* (Xの修正 — Yの場合に対応) |
+| What & why | B | *Y no baai ni erā ga deta node, Z de handoru shimashita* (Yの場合にエラーが出たので、Zでハンドルしました) |
+| Ask for review | B | *go-kakunin onegai-shimasu* (ご確認お願いします) |
+| Flag a caveat | B | *X wa mikakunin desu — betsu PR de taiō yotei desu* (Xは未確認です — 別PRで対応予定です) |
+
+> **Common mistake:** Writing the PR description in *keigo* as if it were a client email — *go-kakunin sasete-itadakitaku zonjimasu* (ご確認させていただきたく存じます). Overformal in a PR body reads as stiff and slightly anxious. Plain *desu / masu* is the norm; save *keigo* for the person you ping, not the description.
+
 ### Sprint planning and refinement
 
 Planning is where you negotiate scope and estimates. Register stays at **B**, but the **rhetorical patterns** matter more than vocab — pushing back politely is a learned skill in Japanese.
@@ -249,10 +266,10 @@ These you should be able to type without thinking.
 
 | Category | Sample terms |
 |---|---|
-| Verbs you'll use daily | *kakunin* (確認), *taiō* (対応), *shūsei* (修正), *kanryō* (完了), *kaishi* (開始), *ki dōchū* (起動中) |
+| Verbs you'll use daily | *kakunin* (確認), *taiō* (対応), *shūsei* (修正), *kanryō* (完了), *kaishi* (開始), *kidōchū* (起動中) |
 | Status updates | *shinchoku desu* (進捗です), *burokkā* (ブロッカー), *omori* (重め), *karui* (軽い), *yokojiku* (横軸) |
 | Asks | *o-negai-shimasu* (お願いします), *kakunin-onegai* (確認お願い), *rebyū-onegai* (レビューお願い), *sōdan* (相談), *teian* (提案) |
-| Tech katakana | *taasuku* (タスク), *komitto* (コミット), *deplyo* (デプロイ), *ma-ji* (マージ), *banbu* (バグ), *risōsu* (リソース) |
+| Tech katakana | *taasuku* (タスク), *komitto* (コミット), *depuroi* (デプロイ), *ma-ji* (マージ), *bagu* (バグ), *risōsu* (リソース) |
 | Soft asks | *chotto* (ちょっと), *shōshō* (少々), *sukoshi* (少し), *moshi yoroshikereba* (もしよろしければ) |
 
 > **Study principle:** Move new vocab from "receive" to "produce" only when you've used it three times in writing. Otherwise it'll sit dead in flashcards.
@@ -297,9 +314,9 @@ Pitch-accent notation here: ⌐ at the start = *atamadaka* (head-high, drops aft
 |---|---|---|
 | *taasuku* (タスク) | ⌐___ (atamadaka) | English-flat — sounds like a question |
 | *komitto* (コミット) | ___⌐ (heiban, then drop on particle) | English stress on first syllable |
-| *deriri-su* (デプロイ) | ___⌐ (heiban-ish) | Stress on "ploy" English-style |
+| *depuroi* (デプロイ) | ___⌐ (heiban-ish) | Stress on "ploy" English-style |
 | *ma-ji* (マージ) | ⌐_ (atamadaka) | Drawn-out, English "merge"-like |
-| *banbu* (バグ) | ⌐_ (atamadaka) | English "bug" with rising tone |
+| *bagu* (バグ) | ⌐_ (atamadaka) | English "bug" with rising tone |
 | *sa-bā* (サーバー) | ⌐___ (atamadaka) | English "server" stress on "ser" |
 | *kuraianto* (クライアント) | ___⌐__ (nakadaka) | English-stress on "cli-" |
 | *risōsu* (リソース) | ___⌐_ (nakadaka) | Flat or English-stressed |
@@ -341,7 +358,7 @@ For token vocabulary, mostly yes. For the **sentence around the noun** — how t
 
 ### How do you say "deploy" or "merge" in Japanese?
 
-*Deplyo* (デプロイ) and *ma-ji* (マージ). The tokens are easy. The interesting choices are around them: *deplyo shimasu* (polite default), *deplyo shitokimasu* (casual same-side), *deplyo sasete-itadakimasu* (over-polite to client). Picking the right register is the actual skill.
+*Depuroi* (デプロイ) and *ma-ji* (マージ). The tokens are easy. The interesting choices are around them: *depuroi shimasu* (polite default), *depuroi shitokimasu* (casual same-side), *depuroi sasete-itadakimasu* (over-polite to client). Picking the right register is the actual skill.
 
 ### What's the most common Japanese mistake foreign engineers make?
 
