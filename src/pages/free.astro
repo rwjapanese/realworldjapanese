@@ -1,0 +1,315 @@
+---
+// Ad landing page (squeeze page) for the free "Saying No 5" PDF.
+// Destination for the Reddit ads flight — no header/footer nav so the only
+// path forward is the beehiiv subscribe link. Incoming utm_* params are
+// forwarded onto the subscribe URL client-side so beehiiv attributes the
+// signup to the ad (otherwise it falls back to referrer attribution).
+// Visual language mirrors the PDF itself: hinomaru red circle on warm
+// off-white, sumi-black type, red heading rules, numbered red badges,
+// A/B/C level chips, vertical-text accent, faint kanji watermark.
+// noindex: this page exists for paid traffic, not search.
+import Layout from "@/layouts/Layout.astro";
+import { NEWSLETTER_SUBSCRIBE_URL } from "@/config/newsletter";
+import { SITE } from "@/config";
+
+const title = "Free PDF: Saying No in Japanese — 5 Work Situations";
+const description =
+  "Five work situations where the textbook phrase quietly backfires — with what NOT to say and casual / work-safe / formal versions. Free PDF by a Tokyo native.";
+const canonical = new URL("/free/", SITE.website).href;
+
+const included = [
+  {
+    head: "5 real work situations",
+    body: "The moments where a direct translation quietly backfires — refusing tasks, deadlines, and invitations.",
+  },
+  {
+    head: "What NOT to say, first",
+    body: "Each situation starts with the phrase that sounds fine in your head but lands wrong in a Japanese office.",
+  },
+  {
+    head: "Three versions per phrase",
+    body: "Casual, work-safe, and formal — with romaji and English notes, so you can match the room.",
+  },
+  {
+    head: "Written by a Tokyo native",
+    body: "The phrasing people actually use at work — not textbook Japanese, not machine translation.",
+  },
+];
+
+const levels = [
+  { label: "A", name: "Casual", note: "Peers you're close with", style: "dark" },
+  { label: "B", name: "Work-safe", note: "The default when unsure", style: "red" },
+  { label: "C", name: "Formal", note: "Clients and bosses", style: "outline" },
+];
+
+const steps = [
+  "Tap the button and enter your email on the next page.",
+  "The PDF lands in your inbox a minute later.",
+  "After that: one work-safe phrase a week. Unsubscribe anytime.",
+];
+---
+
+<Layout
+  title={title}
+  description={description}
+  canonicalURL={canonical}
+  noindex={true}
+  alternates={[{ hreflang: "en", href: canonical }]}
+>
+  <script is:inline>
+    // Brand lock: the LP always renders in light mode ("hinomaru on white")
+    // to stay visually continuous with the ad creative and the PDF itself,
+    // regardless of the visitor's OS theme. Overrides both the data-theme
+    // attribute and the theme API value the head FOUC script stored, so the
+    // later-loading theme script reflects "light" instead of re-applying
+    // the visitor's preference. localStorage is left untouched — the rest
+    // of the site keeps following the visitor's choice.
+    document.firstElementChild?.setAttribute("data-theme", "light");
+    if (window.theme) {
+      window.theme.setTheme("light");
+      window.theme.themeValue = "light";
+    }
+  </script>
+
+  <main id="main-content" class="overflow-x-clip" data-free-lp>
+    <!-- Hero -->
+    <section class="relative">
+      <!-- hinomaru circle, clipped by the right edge (kept small on mobile
+           so it never overlaps the headline) -->
+      <div
+        aria-hidden="true"
+        class="absolute top-[-7rem] right-[-7rem] size-[14rem] rounded-full bg-brand-red sm:top-[-8rem] sm:right-[-9rem] sm:size-[30rem]"
+      >
+      </div>
+      <!-- sakura circle, low left (PDF motif) -->
+      <div
+        aria-hidden="true"
+        class="absolute bottom-[-7rem] left-[-8rem] size-[16rem] rounded-full bg-brand-pink"
+      >
+      </div>
+      <!-- faint kanji watermark -->
+      <p
+        aria-hidden="true"
+        class="pointer-events-none absolute top-6 left-1/2 -translate-x-1/2 text-[16rem] leading-none font-bold text-foreground/[0.04] select-none sm:text-[22rem]"
+      >
+        断
+      </p>
+      <!-- vertical-text accent, sitting on the hinomaru circle -->
+      <p
+        aria-hidden="true"
+        class="absolute top-8 right-6 hidden text-sm font-semibold tracking-[0.3em] text-white/90 [writing-mode:vertical-rl] md:block"
+      >
+        断り方、五場面。
+      </p>
+
+      <div class="app-layout relative z-10">
+        <div class="max-w-xl pt-20 pb-16 sm:pt-28">
+          <p
+            class="mb-4 flex items-center gap-2 text-xs font-semibold tracking-[0.2em] text-foreground uppercase"
+          >
+            <span aria-hidden="true" class="inline-block size-2 bg-brand-red"
+            ></span>
+            Free PDF · Real-World Japanese
+          </p>
+          <h1 class="text-3xl leading-tight font-bold text-foreground sm:text-5xl">
+            Say no at work — without sounding cold
+          </h1>
+          <div aria-hidden="true" class="mt-5 h-1 w-16 bg-brand-red"></div>
+          <p class="mt-6 text-base leading-relaxed text-foreground/80">
+            「無理です」 sounds fine in your head. To your Japanese boss, it
+            slams a door. This free PDF covers the five most common “saying no”
+            moments in a Japanese office — and the exact phrasing that keeps
+            you out of trouble.
+          </p>
+          <a
+            href={NEWSLETTER_SUBSCRIBE_URL}
+            target="_blank"
+            rel="noopener"
+            data-subscribe-link
+            class="mt-8 inline-flex items-center gap-3 rounded-sm bg-brand-red px-8 py-3.5 text-base font-semibold text-white no-underline transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            Get the free PDF
+            <span aria-hidden="true">→</span>
+          </a>
+          <p class="mt-3 text-xs text-foreground/60">
+            Free · sent to your inbox · unsubscribe anytime
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- What's inside -->
+    <section class="app-layout py-12">
+      <h2 class="text-2xl font-bold text-foreground">What’s inside</h2>
+      <div aria-hidden="true" class="mt-2 h-[3px] w-12 bg-brand-red"></div>
+      <ol class="mt-8 grid gap-x-8 gap-y-7 sm:grid-cols-2">
+        {
+          included.map((item, i) => (
+            <li class="flex gap-4">
+              <span
+                aria-hidden="true"
+                class="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-red text-sm font-bold text-white"
+              >
+                {i + 1}
+              </span>
+              <div>
+                <p class="mb-1 font-semibold text-foreground">{item.head}</p>
+                <p class="text-sm leading-relaxed text-foreground/75">
+                  {item.body}
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <!-- A/B/C level chips (straight from the PDF's legend) -->
+      <div class="mt-10 border border-border bg-background p-5">
+        <p class="mb-4 text-xs font-semibold tracking-[0.15em] text-foreground/60 uppercase">
+          Every phrase comes in three levels
+        </p>
+        <ul class="grid gap-3 sm:grid-cols-3">
+          {
+            levels.map(level => (
+              <li class="flex items-center gap-3">
+                <span
+                  aria-hidden="true"
+                  class={`flex size-8 shrink-0 items-center justify-center text-sm font-bold ${
+                    level.style === "dark"
+                      ? "bg-foreground text-background"
+                      : level.style === "red"
+                        ? "bg-brand-red text-white"
+                        : "border-2 border-foreground text-foreground"
+                  }`}
+                >
+                  {level.label}
+                </span>
+                <span class="text-sm text-foreground/85">
+                  <strong class="font-semibold text-foreground">
+                    {level.name}
+                  </strong>
+                  <br />
+                  {level.note}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- Credibility -->
+    <section class="app-layout py-6">
+      <div class="border-l-4 border-brand-red py-1 pl-5">
+        <p class="text-sm leading-relaxed text-foreground/85">
+          I’m a Tokyo native, and I’ve watched sharp foreign coworkers come
+          across as cold at work — not because their Japanese was wrong, but
+          because it was too direct. Real-World Japanese is where I write down
+          the phrasing textbooks skip: what people actually say in Japanese
+          offices, and why.
+        </p>
+        <p class="mt-3 text-xs text-foreground/60">— Ryo, Real-World Japanese</p>
+      </div>
+    </section>
+
+    <!-- How it works + final CTA -->
+    <section class="relative mt-6 overflow-x-clip">
+      <div
+        aria-hidden="true"
+        class="absolute right-[-6rem] bottom-[-9rem] size-[18rem] rounded-full bg-brand-pink"
+      >
+      </div>
+      <div class="app-layout relative py-12">
+        <h2 class="text-2xl font-bold text-foreground">How it works</h2>
+        <div aria-hidden="true" class="mt-2 h-[3px] w-12 bg-brand-red"></div>
+        <ol class="mt-8 max-w-md space-y-4">
+          {
+            steps.map((step, i) => (
+              <li class="flex gap-4 text-sm leading-relaxed text-foreground/80">
+                <span
+                  aria-hidden="true"
+                  class="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-red text-sm font-bold text-white"
+                >
+                  {i + 1}
+                </span>
+                <span class="pt-1">{step}</span>
+              </li>
+            ))
+          }
+        </ol>
+        <a
+          href={NEWSLETTER_SUBSCRIBE_URL}
+          target="_blank"
+          rel="noopener"
+          data-subscribe-link
+          class="mt-10 inline-flex items-center gap-3 rounded-sm bg-brand-red px-8 py-3.5 text-base font-semibold text-white no-underline transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          Get the free PDF
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+    <footer class="app-layout border-t border-border py-8">
+      <p class="text-xs text-foreground/60">
+        © Real-World Japanese ·
+        <a href="/en/" class="underline underline-offset-2 hover:text-accent">
+          realworldjapanese.com
+        </a>
+      </p>
+    </footer>
+  </main>
+</Layout>
+
+<script>
+  // Forward incoming utm_* params (from the ad URL) onto the beehiiv
+  // subscribe links so the signup is attributed to the ad instead of
+  // beehiiv's referrer fallback. Landings without UTMs get tagged as
+  // free-lp/landing so they stay distinguishable from article-CTA signups.
+  function decorateSubscribeLinks() {
+    const incoming = new URLSearchParams(window.location.search);
+    document
+      .querySelectorAll<HTMLAnchorElement>("[data-subscribe-link]")
+      .forEach(link => {
+        const url = new URL(link.href);
+        let hasUtm = false;
+        incoming.forEach((value, key) => {
+          if (key.startsWith("utm_")) {
+            url.searchParams.set(key, value);
+            hasUtm = true;
+          }
+        });
+        if (!hasUtm) {
+          url.searchParams.set("utm_source", "free-lp");
+          url.searchParams.set("utm_medium", "landing");
+        }
+        link.href = url.toString();
+      });
+  }
+
+  // Same GA4 funnel events as EmailCTA/EmailPopup, with cta_type "landing"
+  // so LP performance is separable in GA4 (view = LP loaded, click = CTA).
+  function sendCtaEvent(name: string, params: Record<string, string>) {
+    const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void })
+      .gtag;
+    if (typeof gtag === "function") gtag("event", name, params);
+  }
+
+  function setupFreeLp() {
+    const page = document.querySelector<HTMLElement>("[data-free-lp]");
+    if (!page || page.dataset.lpBound === "1") return;
+    page.dataset.lpBound = "1";
+
+    decorateSubscribeLinks();
+    sendCtaEvent("email_cta_view", { cta_type: "landing", lang: "en" });
+    page
+      .querySelectorAll<HTMLAnchorElement>("[data-subscribe-link]")
+      .forEach(link => {
+        link.addEventListener("click", () => {
+          sendCtaEvent("email_cta_click", { cta_type: "landing", lang: "en" });
+        });
+      });
+  }
+
+  document.addEventListener("astro:page-load", setupFreeLp);
+</script>

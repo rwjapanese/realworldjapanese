@@ -3,21 +3,30 @@
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+/* Brand palette: inherited from the "Saying No 5" PDF (hinomaru red on
+   warm off-white with sumi-black type). --accent is the darker text-safe
+   red (AA on --background); --brand-red is the vivid fill red reserved for
+   decorative shapes and solid buttons with white text; --brand-pink is the
+   soft sakura circle used as a background motif. */
 :root,
 html[data-theme="light"] {
-  --background: #fdfdfd;
-  --foreground: #282728;
-  --accent: #006cac;
-  --muted: #e6e6e6;
-  --border: #ece9e9;
+  --background: #f6f6f6;
+  --foreground: #1a1a1c;
+  --accent: #c8102e;
+  --muted: #eae8e6;
+  --border: #e0dedb;
+  --brand-red: #e4002b;
+  --brand-pink: #f4ced4;
 }
 
 html[data-theme="dark"] {
-  --background: #212737;
-  --foreground: #eaedf3;
-  --accent: #ff6b01;
-  --muted: #343f60;
-  --border: #ab4b08;
+  --background: #1b1b1f;
+  --foreground: #ececee;
+  --accent: #ff4a5f;
+  --muted: #2a2a30;
+  --border: #3a3a40;
+  --brand-red: #e4002b;
+  --brand-pink: #55242d;
 }
 
 @theme inline {
@@ -27,6 +36,8 @@ html[data-theme="dark"] {
   --color-accent: var(--accent);
   --color-muted: var(--muted);
   --color-border: var(--border);
+  --color-brand-red: var(--brand-red);
+  --color-brand-pink: var(--brand-pink);
 }
 
 @layer base {
